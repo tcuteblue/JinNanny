@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff4d6">
+<meta name="description" content="工作室收入記帳－孩童收支、禮金與簡易記事管理">
+<title>工作室收入記帳</title>
+<link rel="icon" href="./ico.png" type="image/png">
+<link rel="apple-touch-icon" href="./ico-192.png">
+<link id="dynamicManifest" rel="manifest">
+<style>
+:root{--ink:#493528;--muted:#8c7868;--cream:#fffaf0;--paper:#fff;--gold:#f7b928;--orange:#f18b37;--pink:#f47d91;--green:#78a86d;--line:#f0dfc2;--shadow:0 8px 24px rgba(103,69,30,.09);--danger:#c85d56}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fff3d2 0,#fffaf1 270px,#fffaf1 100%);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:var(--ink);min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.app{max-width:980px;margin:auto;padding:18px 18px 44px}.topbar{display:flex;align-items:center;gap:13px;margin:2px 0 18px}.logo{width:64px;height:64px;object-fit:cover;border-radius:18px;box-shadow:0 4px 12px #8e5b2425}.brand{flex:1}.brand h1{margin:0;font-size:23px;letter-spacing:.04em}.brand p{margin:4px 0 0;color:#9a6b35;font-size:13px}.top-actions{display:flex;gap:8px;align-items:center}.icon-btn{background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px 12px;color:var(--ink);box-shadow:0 3px 8px #86531a10}.statusline{font-size:12px;color:var(--muted);margin:0 0 14px;padding-left:4px}.panel{background:var(--paper);border:1px solid #f2e5cf;border-radius:20px;padding:18px;box-shadow:var(--shadow);margin-bottom:15px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}.section-head h2,.section-head h3{margin:0;font-size:18px}.subtle{font-size:13px;color:var(--muted)}.primary{background:linear-gradient(135deg,#f6b72d,#f18b37);color:#fff;font-weight:750;border-radius:13px;padding:11px 16px;box-shadow:0 5px 12px #eea22b35}.secondary{background:#fff3d7;color:#86551d;border:1px solid #f4d89b;border-radius:12px;padding:10px 14px;font-weight:650}.soft{background:#fff8ec;color:#795b3a;border:1px solid #f2e6d4;border-radius:11px;padding:8px 11px}.danger{background:#fff0ed;color:#b44c45;border:1px solid #f3d3ce;border-radius:11px;padding:8px 11px}.small{font-size:13px;padding:7px 10px}.children-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:12px}.child-card{border:1px solid #f1dfbd;border-radius:17px;padding:15px;background:linear-gradient(145deg,#fffdf8,#fff6e6);text-align:left;display:flex;gap:12px;align-items:center;min-height:86px;color:var(--ink);transition:.15s}.child-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.child-avatar{width:48px;height:48px;display:grid;place-items:center;background:#ffe8a5;border-radius:15px;font-size:25px;flex:none}.child-card strong{display:block;font-size:17px}.child-card small{color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:30px 10px;line-height:1.8}.tab-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}.tab{padding:9px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);color:#806d5b;font-weight:650}.tab.active{background:#ffedbd;color:#7b4f13;border-color:#f5d17e}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 16px}.summary-card{border:1px solid #f2e3c9;border-radius:15px;padding:13px;background:#fffdf9}.summary-card span{display:block;font-size:12px;color:var(--muted)}.summary-card strong{font-size:20px;display:block;margin-top:5px;overflow-wrap:anywhere}.income{color:#57914f}.expense{color:#c46d58}.net{color:#9a6a15}.record-list{display:flex;flex-direction:column;gap:9px}.record{border:1px solid #f1e7d8;border-radius:14px;padding:12px 13px;display:flex;align-items:center;gap:12px;background:#fff}.record-main{flex:1;min-width:0}.record-title{font-weight:750}.record-meta{font-size:12px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}.record-amount{font-weight:800;white-space:nowrap}.record-actions{display:flex;gap:5px}.month-picker{border:1px solid var(--line);border-radius:11px;padding:8px 10px;background:white;color:var(--ink)}.category-breakdown{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px 0;border-bottom:1px dashed #eee1cf}.category-breakdown:last-child{border-bottom:0}.note-card{background:#fffaf1;border:1px solid #f2e3c9;border-left:4px solid #efb33c;border-radius:13px;padding:12px}.note-card h4{margin:0 0 5px}.note-card p{margin:5px 0;color:#75614f;font-size:13px}.toolbar{display:flex;flex-wrap:wrap;gap:8px}.settings-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.setting-tile{border:1px solid var(--line);background:#fffdf8;border-radius:15px;padding:14px;text-align:left;color:var(--ink)}.setting-tile strong{display:block;margin-bottom:4px}.category-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f3eadc}.category-row:last-child{border-bottom:0}.category-name{flex:1}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}.field label{font-size:13px;font-weight:700;color:#76583d}.field input,.field select,.field textarea{width:100%;border:1px solid #e9dbc5;border-radius:11px;padding:11px 12px;background:#fffdf9;color:var(--ink);outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:#e8ac36;box-shadow:0 0 0 3px #f7d99044}.field textarea{min-height:78px;resize:vertical}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.modal-backdrop{position:fixed;inset:0;background:#36231666;display:flex;align-items:center;justify-content:center;padding:15px;z-index:20}.modal{width:min(540px,100%);max-height:92vh;overflow:auto;background:#fffdf8;border-radius:20px;padding:20px;box-shadow:0 18px 60px #3b251c44}.modal h3{margin:0 0 16px;font-size:20px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:15px}.helper{font-size:12px;color:var(--muted);line-height:1.6}.duration{display:inline-block;background:#fff0c2;color:#825917;border-radius:10px;padding:7px 10px;font-weight:750;font-size:13px}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:11px 16px;border-radius:12px;background:#4e3a2c;color:white;box-shadow:var(--shadow);z-index:50;max-width:90vw;text-align:center;font-size:14px}.hidden{display:none!important}.lock-wrap{max-width:430px;margin:8vh auto;background:white;border-radius:22px;padding:25px;box-shadow:var(--shadow);border:1px solid var(--line)}.lock-wrap img{width:82px;height:82px;border-radius:20px;display:block;margin:0 auto 12px}.lock-wrap h2{text-align:center;margin:0 0 6px}.lock-wrap p{text-align:center;color:var(--muted);font-size:13px;margin:0 0 20px}.footer{text-align:center;color:#aa9277;font-size:11px;margin:22px 0 0}.divider{border:0;border-top:1px solid #f1e6d5;margin:16px 0}
+@media(max-width:620px){.app{padding:12px 12px 32px}.topbar{gap:10px}.logo{width:54px;height:54px;border-radius:15px}.brand h1{font-size:19px}.brand p{font-size:11px}.top-actions{gap:5px}.icon-btn{padding:9px}.panel{padding:15px;border-radius:17px}.summary-grid{gap:7px}.summary-card{padding:10px}.summary-card strong{font-size:17px}.record{align-items:flex-start;flex-wrap:wrap}.record-actions{width:100%;justify-content:flex-end}.form-grid{grid-template-columns:1fr}.section-head{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div id="appRoot" class="app">
+  <div id="loading" class="empty">正在連接工作室雲端資料……</div>
+</div>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+<input id="localFileInput" type="file" accept="application/json,.json" class="hidden">
+<script>
+'use strict';
+
+// ===== 專案連線設定：此網址對應本專案專用 GAS =====
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwW46ovnM9y_jkwO9sBlSPj9DLkj7NRj--1SVusZhbLE3X1F_mteQ7A8Z5hAEr0EP8S/exec';
+const APP_NAME = '工作室收入記帳';
+const $ = (selector, root=document) => root.querySelector(selector);
+const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const money = value => 'NT$' + Number(value || 0).toLocaleString('zh-TW', {maximumFractionDigits:0});
+const today = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+const thisMonth = () => today().slice(0,7);
+const uid = prefix => prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+let state = {children:[],transactions:[],notes:[],categories:[],settings:{}};
+let currentChildId = null;
+let childTab = 'ledger';
+let selectedMonth = thisMonth();
+let showArchived = false;
+let toastTimer = null;
+let requestCounter = 0;
+let deferredInstallPrompt = null;
+
+function base64UrlEncode(text) {
+  const bytes = new TextEncoder().encode(text);
+  let binary = '';
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function api(action, params={}) {
+  return new Promise((resolve,reject) => {
+    const callback = '__studioCb' + (++requestCounter) + '_' + Date.now();
+    const script = document.createElement('script');
+    let done = false;
+    const finish = (err, data) => {
+      if (done) return; done = true;
+      clearTimeout(timer); script.remove(); delete window[callback];
+      err ? reject(err) : resolve(data);
+    };
+    window[callback] = data => finish(null,data);
+    const query = new URLSearchParams({action, callback, _:String(Date.now())});
+    Object.entries(params).forEach(([k,v]) => query.set(k,String(v)));
+    script.onerror = () => finish(new Error('無法連接 GAS，請檢查部署網址及網路。'));
+    const timer = setTimeout(() => finish(new Error('雲端連線逾時，請稍後再試。')), 30000);
+    script.src = GAS_URL + '?' + query.toString();
+    document.head.appendChild(script);
+  });
+}
+async function apiMutation(ops) {
+  const data = base64UrlEncode(JSON.stringify({ops}));
+  const result = await api('mutate',{data});
+  if (!result.ok) throw new Error(result.error || '雲端寫入失敗。');
+  if (!result.backupOk) showToast(result.backupMessage || '資料已寫入試算表，但自動備份未完成。');
+  await loadState(false);
+  return result;
+}
+async function loadState(showNotice=true) {
+  const result = await api('bootstrap');
+  if (!result.ok) throw new Error(result.error || '讀取雲端資料失敗。');
+  state = normalizeState(result.state || {});
+  if (showNotice) showToast('雲端資料已同步');
+  render();
+}
+function normalizeState(s) {
+  return {children:Array.isArray(s.children)?s.children:[],transactions:Array.isArray(s.transactions)?s.transactions:[],notes:Array.isArray(s.notes)?s.notes:[],categories:Array.isArray(s.categories)?s.categories:[],settings:s.settings||{}};
+}
+function showToast(message) {
+  const root=$('#toastRoot'); root.innerHTML=`<div class="toast">${esc(message)}</div>`;
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>root.innerHTML='',3600);
+}
+function setBusy(button, busy, label) { if(!button)return; if(busy){button.dataset.oldText=button.textContent;button.disabled=true;button.textContent=label||'處理中…';}else{button.disabled=false;button.textContent=button.dataset.oldText||button.textContent;} }
+function render() {
+  const child = state.children.find(c=>c.id===currentChildId);
+  if (currentChildId && child) renderChild(child); else { currentChildId=null; renderHome(); }
+}
+function shell(content) {
+  const root=$('#appRoot');
+  root.innerHTML=`
+    <header class="topbar">
+      <img class="logo" src="./ico.png" alt="工作室收入記帳圖示" onerror="this.style.display='none'">
+      <div class="brand"><h1>${APP_NAME}</h1><p>把每一份照顧與收穫，好好記錄下來</p></div>
+      <div class="top-actions">
+        <button class="icon-btn" data-action="install" title="安裝到手機">⬇️</button>
+        <button class="icon-btn" data-action="settings" title="設定與備份">⚙️</button>
+      </div>
+    </header>
+    <div class="statusline">☁️ 雲端同步中｜資料保存於專用 Google 試算表</div>
+    ${content}
+    <div class="footer">工作室收入記帳・專用雲端資料</div>`;
+}
+function renderHome() {
+  const active=state.children.filter(c=>c.status!=='archived').sort((a,b)=>String(a.name).localeCompare(String(b.name),'zh-TW'));
+  const archived=state.children.filter(c=>c.status==='archived').sort((a,b)=>String(a.name).localeCompare(String(b.name),'zh-TW'));
+  const list=showArchived?archived:active;
+  const income=state.transactions.filter(t=>String(t.date||'').startsWith(thisMonth())&&t.type==='income').reduce((s,t)=>s+Number(t.amount||0),0);
+  const expenses=state.transactions.filter(t=>String(t.date||'').startsWith(thisMonth())&&t.type==='expense').reduce((s,t)=>s+Number(t.amount||0),0);
+  shell(`
+    <section class="panel">
+      <div class="section-head"><div><h2>${showArchived?'已離托孩童':'目前收托孩童'}</h2><div class="subtle">${showArchived?'歷史資料完整保留，可隨時恢復收托':'選擇孩童即可查看個別收支與記事'}</div></div><button class="primary" data-action="add-child">＋ 新增孩童</button></div>
+      <div class="tab-row"><button class="tab ${!showArchived?'active':''}" data-action="show-active">收托中（${active.length}）</button><button class="tab ${showArchived?'active':''}" data-action="show-archived">已離托（${archived.length}）</button></div>
+      ${list.length?`<div class="children-grid">${list.map(c=>`<button class="child-card" data-action="open-child" data-id="${esc(c.id)}"><span class="child-avatar">${showArchived?'📁':'🧸'}</span><span><strong>${esc(c.name)}</strong><small>${showArchived?'已離托・點選查看歷史':'點選進入孩童帳務'}</small></span></button>`).join('')}</div>`:`<div class="empty">${showArchived?'目前沒有已離托的孩童。':'尚未新增孩童，按右上方「新增孩童」開始建立資料。'}</div>`}
+    </section>
+    <section class="panel"><div class="section-head"><div><h3>本月工作室收支概況</h3><div class="subtle">${thisMonth()}</div></div></div>
+      <div class="summary-grid"><div class="summary-card"><span>收入</span><strong class="income">${money(income)}</strong></div><div class="summary-card"><span>支出／退費</span><strong class="expense">${money(expenses)}</strong></div><div class="summary-card"><span>收入淨額</span><strong class="net">${money(income-expenses)}</strong></div></div>
+    </section>
+  `);
+}
+function childRecords(childId, month='') {
+  return state.transactions.filter(t=>t.childId===childId&&(!month||String(t.date||'').startsWith(month))).sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.updatedAt).localeCompare(String(a.updatedAt)));
+}
+function childNotes(childId, month='') {
+  return state.notes.filter(n=>n.childId===childId&&(!month||String(n.date||'').startsWith(month))).sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.startTime).localeCompare(String(a.startTime)));
+}
+function totals(records) {
+  const income=records.filter(r=>r.type==='income').reduce((s,r)=>s+Number(r.amount||0),0);
+  const expense=records.filter(r=>r.type==='expense').reduce((s,r)=>s+Number(r.amount||0),0);
+  return {income,expense,net:income-expense};
+}
+function renderChild(child) {
+  const records=childRecords(child.id);
+  const currentTotals=totals(records.filter(r=>String(r.date||'').startsWith(thisMonth())));
+  const tabs=[['ledger','收支明細'],['month','月份統計'],['notes','簡易記事']];
+  let body='';
+  if(childTab==='ledger') body=renderLedger(child,records);
+  else if(childTab==='month') body=renderMonth(child,records);
+  else body=renderNotes(child);
+  shell(`
+    <section class="panel">
+      <div class="section-head"><div><button class="soft small" data-action="back-home">← 返回孩童列表</button><h2 style="margin-top:10px">🧸 ${esc(child.name)}${child.status==='archived'?' <span class="subtle">（已離托）</span>':''}</h2><div class="subtle">個別收支、禮金與照顧記事</div></div><div class="toolbar"><button class="soft small" data-action="manage-categories">項目設定</button><button class="soft small" data-action="edit-child" data-id="${esc(child.id)}">編輯資料</button></div></div>
+      <div class="summary-grid"><div class="summary-card"><span>本月收入</span><strong class="income">${money(currentTotals.income)}</strong></div><div class="summary-card"><span>本月支出／退費</span><strong class="expense">${money(currentTotals.expense)}</strong></div><div class="summary-card"><span>本月收入淨額</span><strong class="net">${money(currentTotals.net)}</strong></div></div>
+      <div class="tab-row">${tabs.map(([key,label])=>`<button class="tab ${childTab===key?'active':''}" data-action="child-tab" data-tab="${key}">${label}</button>`).join('')}</div>
+      ${body}
+    </section>
+    <section class="panel"><div class="section-head"><h3>孩童資料管理</h3></div><div class="toolbar">${child.status==='archived'?`<button class="secondary" data-action="restore-child" data-id="${esc(child.id)}">恢復收托</button>`:`<button class="danger" data-action="archive-child" data-id="${esc(child.id)}">設為已離托</button>`}</div><p class="helper">設為已離托不會刪除任何收入、支出或簡易記事；日後可從「已離托」名單恢復。</p></section>
+  `);
+}
+function renderLedger(child,records) {
+  const monthRecords=selectedMonth==='all'?records:records.filter(r=>String(r.date||'').startsWith(selectedMonth));
+  const t=totals(monthRecords);
+  return `<div class="section-head"><div><h3>逐筆收支紀錄</h3><div class="subtle">依日期由新到舊排列</div></div><div class="toolbar">${child.status==='archived'?'<span class="subtle">已離托資料僅供查閱與修正</span>':'<button class="primary" data-action="add-transaction" data-type="income">＋ 收入</button><button class="secondary" data-action="add-transaction" data-type="expense">＋ 支出</button>'}</div></div>
+    <div class="toolbar" style="margin-bottom:12px"><select id="ledgerMonth" class="month-picker"><option value="all" ${selectedMonth==='all'?'selected':''}>全部月份</option>${monthOptions(records,selectedMonth)}</select></div>
+    <div class="summary-grid"><div class="summary-card"><span>收入</span><strong class="income">${money(t.income)}</strong></div><div class="summary-card"><span>支出／退費</span><strong class="expense">${money(t.expense)}</strong></div><div class="summary-card"><span>淨額</span><strong class="net">${money(t.net)}</strong></div></div>
+    ${monthRecords.length?`<div class="record-list">${monthRecords.map(renderTransaction).join('')}</div>`:`<div class="empty">這個期間還沒有收支紀錄。<br>可使用上方「收入」或「支出」新增第一筆資料。</div>`}`;
+}
+function monthOptions(records,selected) {
+  const months=[...new Set(records.map(r=>String(r.date||'').slice(0,7)).filter(Boolean))].sort().reverse();
+  if(!months.includes(thisMonth())) months.unshift(thisMonth());
+  return months.map(m=>`<option value="${esc(m)}" ${selected===m?'selected':''}>${esc(m.replace('-',' 年 '))} 月</option>`).join('');
+}
+function renderTransaction(t) {
+  const isIncome=t.type==='income';
+  const gift=t.categoryId==='cat_gift'||t.category==='禮金'||Number(t.giftCash||0)>0||t.giftItemName;
+  let extras='';
+  if(gift){const details=[t.giftFestival,t.giftItemName,t.giftItemValue?`禮品估值 ${money(t.giftItemValue)}`:''].filter(Boolean).join('・');if(details)extras=`<div class="record-meta">${esc(details)}</div>`;}
+  return `<div class="record"><div class="record-main"><div class="record-title">${esc(t.category|| (isIncome?'收入':'支出'))}${gift?' 🎁':''}</div><div class="record-meta">${esc(t.date||'')}${t.paymentMethod?'・'+esc(t.paymentMethod):''}${t.note?'・'+esc(t.note):''}</div>${extras}</div><div class="record-amount ${isIncome?'income':'expense'}">${isIncome?'+':'−'}${money(t.amount)}</div><div class="record-actions"><button class="soft small" data-action="edit-transaction" data-id="${esc(t.id)}">編輯</button><button class="danger small" data-action="delete-transaction" data-id="${esc(t.id)}">刪除</button></div></div>`;
+}
+function renderMonth(child,records) {
+  const list=records.filter(r=>String(r.date||'').startsWith(selectedMonth));
+  const t=totals(list);
+  const groups={};
+  list.forEach(r=>{const key=(r.type==='income'?'收入｜':'支出｜')+(r.category||'未分類');groups[key]=(groups[key]||0)+Number(r.amount||0);});
+  return `<div class="section-head"><div><h3>月份收支統計</h3><div class="subtle">依月份彙整 ${esc(child.name)} 的逐筆紀錄</div></div>${child.status==='archived'?'':'<button class="primary" data-action="add-transaction" data-type="income">＋ 新增紀錄</button>'}</div>
+    <div class="toolbar" style="margin-bottom:12px"><input id="monthPicker" class="month-picker" type="month" value="${esc(selectedMonth)}"></div>
+    <div class="summary-grid"><div class="summary-card"><span>當月收入</span><strong class="income">${money(t.income)}</strong></div><div class="summary-card"><span>當月支出／退費</span><strong class="expense">${money(t.expense)}</strong></div><div class="summary-card"><span>當月收入淨額</span><strong class="net">${money(t.net)}</strong></div></div>
+    <h3 style="font-size:15px">項目分類小計</h3>${Object.keys(groups).length?Object.entries(groups).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="category-breakdown"><span>${esc(k)}</span><strong>${money(v)}</strong></div>`).join(''):`<div class="empty">這個月份沒有紀錄。</div>`}
+    <hr class="divider"><h3 style="font-size:15px">本月逐筆明細</h3>${list.length?`<div class="record-list">${[...list].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(renderTransaction).join('')}</div>`:''}`;
+}
+function renderNotes(child) {
+  const list=childNotes(child.id,selectedMonth==='all'?'':selectedMonth);
+  return `<div class="section-head"><div><h3>照顧與到托簡易記事</h3><div class="subtle">填寫開始、結束時間，自動計算時數</div></div>${child.status==='archived'?'':'<button class="primary" data-action="add-note">＋ 新增記事</button>'}</div>
+    <div class="toolbar" style="margin-bottom:12px"><select id="noteMonth" class="month-picker"><option value="all" ${selectedMonth==='all'?'selected':''}>全部月份</option>${monthOptions(state.notes.filter(n=>n.childId===child.id),selectedMonth)}</select></div>
+    ${list.length?`<div class="record-list">${list.map(n=>`<div class="note-card"><div class="section-head" style="margin:0"><h4>${esc(n.type||'記事')}</h4><strong>${Number(n.durationMinutes||0)?(Number(n.durationMinutes)/60).toFixed(2).replace(/\.00$/,'')+' 小時':''}</strong></div><p>📅 ${esc(n.date||'')}　${esc(n.startTime||'未填')}–${esc(n.endTime||'未填')}</p>${n.note?`<p>${esc(n.note)}</p>`:''}<div class="toolbar"><button class="soft small" data-action="edit-note" data-id="${esc(n.id)}">編輯</button><button class="danger small" data-action="delete-note" data-id="${esc(n.id)}">刪除</button></div></div>`).join('')}</div>`:`<div class="empty">還沒有簡易記事。<br>可記錄生病、臨托、延托或當日到托時數。</div>`}`;
+}
+function renderSettings() {
+  const cats=state.categories.filter(c=>c.active!==false&&c.active!=='false');
+  shell(`<section class="panel"><div class="section-head"><div><button class="soft small" data-action="back-home">← 返回首頁</button><h2 style="margin-top:10px">設定與資料管理</h2></div></div>
+    <div class="settings-list">
+      <button class="setting-tile" data-action="manage-categories"><strong>🧾 收入／支出項目設定</strong><span class="subtle">新增、編輯、停用及調整順序</span></button>
+      <button class="setting-tile" data-action="cloud-backup"><strong>☁️ 雲端備份</strong><span class="subtle">立即將總控試算表資料備份至專用資料夾</span></button>
+      <button class="setting-tile" data-action="cloud-restore"><strong>♻️ 雲端還原</strong><span class="subtle">以雲端備份覆蓋總控試算表資料</span></button>
+      <button class="setting-tile" data-action="local-backup"><strong>📥 本機備份</strong><span class="subtle">下載 JSON 資料檔保存至自己的裝置</span></button>
+      <button class="setting-tile" data-action="local-restore"><strong>📤 本機還原</strong><span class="subtle">選擇 JSON 備份檔，合併匯入資料</span></button>
+    </div>
+    <hr class="divider"><h3 style="font-size:16px">目前項目</h3><p class="helper">每位孩童各自管理收入與支出項目，不會因為修改某位孩童的項目而影響其他孩童。已停用的項目不會出現在新增表單中，但歷史紀錄仍保留。</p>
+    <p class="helper">雲端總控試算表會建立「孩童資料、收支明細、簡易記事、項目設定、系統設定」五個工作表。收入與支出採逐筆記錄；禮品價值為備註性估值，收入統計只計入實際現金金額。</p>
+  </section>`);
+}
+
+function openModal(title,inner,formName='') {
+  $('#modalRoot').innerHTML=`<div class="modal-backdrop"><div class="modal" role="dialog" aria-modal="true"><h3>${title}</h3>${formName?`<form id="modalForm" data-form="${formName}">` : ''}${inner}${formName?'</form>':''}</div></div>`;
+}
+function closeModal(){ $('#modalRoot').innerHTML=''; }
+function childForm(child={}) {
+  openModal(child.id?'編輯孩童資料':'新增孩童',`<div class="field"><label>孩童姓名</label><input name="name" required maxlength="40" value="${esc(child.name||'')}" placeholder="請輸入孩童姓名"></div><div class="field"><label>備註（選填）</label><textarea name="memo" placeholder="例如：聯絡提醒">${esc(child.memo||'')}</textarea></div><div class="modal-actions"><button type="button" class="soft" data-action="close-modal">取消</button><button class="primary" type="submit">儲存</button></div>`, 'child');
+  $('#modalForm').dataset.id=child.id||''; $('#modalForm').dataset.status=child.status||'active';
+}
+function getChildCategories(childId,type=null) {
+  let list=state.categories.filter(c=>String(c.childId||'')===String(childId));
+  if(!list.length) list=state.categories.filter(c=>String(c.childId||'')==='*');
+  list=list.filter(c=>c.active!==false&&c.active!=='false');
+  return (type?list.filter(c=>c.type===type):list).sort((a,b)=>a.type.localeCompare(b.type)||Number(a.sort)-Number(b.sort));
+}
+async function ensureChildCategories(childId) {
+  const own=state.categories.filter(c=>String(c.childId||'')===String(childId));
+  if(own.length)return;
+  const templates=state.categories.filter(c=>String(c.childId||'')==='*'&&c.active!==false&&c.active!=='false');
+  if(!templates.length)return;
+  const ops=templates.map(c=>({kind:'saveCategory',data:{id:uid('cat'),childId:childId,type:c.type,name:c.name,sort:c.sort,active:true}}));
+  await apiMutation(ops);
+}
+function chooseChildCategoryManager() {
+  const children=state.children.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),'zh-TW'));
+  openModal('選擇要設定項目的孩童',`${children.length?children.map(c=>`<div class="category-row"><span class="category-name">${esc(c.name)}${c.status==='archived'?'（已離托）':''}</span><button class="secondary small" data-action="choose-category-child" data-id="${esc(c.id)}">設定項目</button></div>`).join(''):'<div class="empty">請先新增孩童。</div>'}<div class="modal-actions"><button class="soft" data-action="close-modal">關閉</button></div>`);
+}
+function transactionForm(type='income',record={}) {
+  const editing=!!record.id; const chosenType=record.type||type;
+  const categories=getChildCategories(currentChildId,chosenType);
+  const previousCategory=record.categoryId?state.categories.find(c=>c.id===record.categoryId):null;
+  if(previousCategory&&!categories.some(c=>c.id===previousCategory.id)) categories.push(previousCategory);
+  const categoryId=record.categoryId||categories[0]?.id||'';
+  const isGift=categoryId==='cat_gift'||categories.find(c=>c.id===categoryId)?.name==='禮金';
+  const categoryOptions=categories.map(c=>`<option value="${esc(c.id)}" ${c.id===categoryId?'selected':''}>${esc(c.name)}${c.active===false||c.active==='false'?'（已停用）':''}</option>`).join('');
+  const amount=record.amount??record.giftCash??'';
+  openModal(editing?'編輯收支紀錄':(chosenType==='income'?'新增收入':'新增支出'),`
+    <div class="form-grid"><div class="field"><label>收支類型</label><select name="type" id="txType"><option value="income" ${chosenType==='income'?'selected':''}>收入</option><option value="expense" ${chosenType==='expense'?'selected':''}>支出／退費</option></select></div><div class="field"><label>日期</label><input type="date" name="date" required value="${esc(record.date||today())}"></div></div>
+    <div class="field"><label>收入／支出項目</label><select name="categoryId" id="txCategory" required>${categoryOptions}</select></div>
+    <div class="field"><label id="amountLabel">${isGift?'現金金額':(chosenType==='income'?'收入金額':'支出金額')}</label><input type="number" name="amount" min="0" step="1" value="${esc(amount)}" placeholder="輸入金額"></div>
+    <div id="giftFields" class="${isGift?'':'hidden'}"><div class="field"><label>節日</label><select name="giftFestival"><option value="">未指定</option>${['過年','端午','中秋'].map(x=>`<option ${record.giftFestival===x?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>禮品名稱（選填）</label><input name="giftItemName" value="${esc(record.giftItemName||'')}" placeholder="例如：禮盒、玩具"></div><div class="field"><label>禮品價值（選填）</label><input type="number" name="giftItemValue" min="0" step="1" value="${esc(record.giftItemValue||'')}" placeholder="僅供記錄，不列入現金收入統計"></div><p class="helper">禮金可同時記錄現金與禮品，也可以只記錄其中一種。禮品價值不會併入實際現金收入。</p></div>
+    <div class="field"><label>收款／付款方式</label><select name="paymentMethod"><option value="">未指定</option>${['現金','轉帳','其他'].map(x=>`<option ${record.paymentMethod===x?'selected':''}>${x}</option>`).join('')}</select></div>
+    <div class="field"><label>備註</label><textarea name="note" placeholder="可不填">${esc(record.note||'')}</textarea></div>
+    <div class="modal-actions"><button type="button" class="soft" data-action="close-modal">取消</button><button type="submit" class="primary">儲存紀錄</button></div>
+  `,'transaction');
+  $('#modalForm').dataset.id=record.id||''; $('#modalForm').dataset.childId=currentChildId;
+  $('#txType').addEventListener('change',()=>refreshTransactionCategories());
+  $('#txCategory').addEventListener('change',()=>toggleGiftFields());
+  toggleGiftFields();
+}
+function refreshTransactionCategories() {
+  const form=$('#modalForm'); if(!form)return;
+  const type=$('#txType').value;
+  const cats=getChildCategories(currentChildId,type);
+  $('#txCategory').innerHTML=cats.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  toggleGiftFields();
+  $('#amountLabel').textContent=type==='income'?'收入金額':'支出金額';
+}
+function toggleGiftFields() {
+  const id=$('#txCategory')?.value;
+  const cat=state.categories.find(c=>c.id===id);
+  const isGift=id==='cat_gift'||cat?.name==='禮金';
+  $('#giftFields')?.classList.toggle('hidden',!isGift);
+  const label=$('#amountLabel'); if(label)label.textContent=isGift?'現金金額':($('#txType').value==='income'?'收入金額':'支出金額');
+  const amountInput=$('#modalForm [name="amount"]'); if(amountInput)amountInput.required=!isGift;
+}
+function noteForm(note={}) {
+  openModal(note.id?'編輯簡易記事':'新增簡易記事',`
+    <div class="form-grid"><div class="field"><label>日期</label><input type="date" name="date" required value="${esc(note.date||today())}"></div><div class="field"><label>記事類型</label><select name="type">${['生病','臨托','延托','當日到托時數'].map(x=>`<option ${note.type===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
+    <div class="form-grid"><div class="field"><label>開始時間</label><input id="noteStart" type="time" name="startTime" value="${esc(note.startTime||'')}"></div><div class="field"><label>結束時間</label><input id="noteEnd" type="time" name="endTime" value="${esc(note.endTime||'')}"></div></div>
+    <div class="field"><label>自動計算時數</label><div><span class="duration" id="durationPreview">${formatDuration(note.durationMinutes||0)}</span><div class="helper">例如 08:00 到 18:00，會自動計算為 10 小時。若結束時間早於開始時間，視為跨日。</div></div></div>
+    <div class="field"><label>記事內容／備註</label><textarea name="note" placeholder="可記錄請假原因、臨托狀況或其他提醒">${esc(note.note||'')}</textarea></div>
+    <div class="modal-actions"><button type="button" class="soft" data-action="close-modal">取消</button><button type="submit" class="primary">儲存記事</button></div>
+  `,'note');
+  $('#modalForm').dataset.id=note.id||''; $('#modalForm').dataset.childId=currentChildId;
+  $('#noteStart').addEventListener('input',updateDurationPreview); $('#noteEnd').addEventListener('input',updateDurationPreview);
+}
+function durationMinutes(start,end) {
+  if(!start||!end)return 0;
+  const [sh,sm]=start.split(':').map(Number),[eh,em]=end.split(':').map(Number);
+  let diff=eh*60+em-(sh*60+sm); if(diff<0)diff+=1440; return diff;
+}
+function formatDuration(minutes) { return minutes?`${Math.floor(minutes/60)} 小時 ${minutes%60} 分鐘`:'尚未計算'; }
+function updateDurationPreview(){const m=durationMinutes($('#noteStart')?.value,$('#noteEnd')?.value);$('#durationPreview').textContent=formatDuration(m);}
+function categoryManager() {
+  if(!currentChildId){chooseChildCategoryManager();return;}
+  const child=state.children.find(c=>c.id===currentChildId);
+  const cats=state.categories.filter(c=>String(c.childId||'')===String(currentChildId)&&c.active!==false&&c.active!=='false').sort((a,b)=>a.type.localeCompare(b.type)||Number(a.sort)-Number(b.sort));
+  openModal(`${esc(child?.name||'孩童')}－收入／支出項目設定`,`<p class="helper">刪除項目會改為停用，不會影響以前已記錄的資料。</p>${['income','expense'].map(type=>`<h4>${type==='income'?'收入項目':'支出項目'}</h4>${cats.filter(c=>c.type===type).map((c,i)=>`<div class="category-row"><span class="category-name">${esc(c.name)}</span><button class="soft small" data-action="move-category" data-id="${esc(c.id)}" data-dir="-1">↑</button><button class="soft small" data-action="move-category" data-id="${esc(c.id)}" data-dir="1">↓</button><button class="soft small" data-action="edit-category" data-id="${esc(c.id)}">編輯</button><button class="danger small" data-action="deactivate-category" data-id="${esc(c.id)}">停用</button></div>`).join('')||'<div class="helper">尚無項目</div>'}`).join('<hr class="divider">')}<div class="modal-actions"><button class="secondary" type="button" data-action="new-category" data-type="income">＋ 收入項目</button><button class="secondary" type="button" data-action="new-category" data-type="expense">＋ 支出項目</button><button class="soft" type="button" data-action="close-modal">完成</button></div>`);
+}
+function editCategoryForm(category={}) {
+  openModal(category.id?'編輯項目':'新增項目',`<div class="field"><label>項目類型</label><select name="type" ${category.id?'disabled':''}><option value="income" ${category.type==='income'?'selected':''}>收入</option><option value="expense" ${category.type==='expense'?'selected':''}>支出</option></select></div><div class="field"><label>項目名稱</label><input name="name" required maxlength="30" value="${esc(category.name||'')}" placeholder="例如：副食品、請假退費"></div><div class="modal-actions"><button type="button" class="soft" data-action="close-modal">取消</button><button type="submit" class="primary">儲存</button></div>`,'category');
+  $('#modalForm').dataset.id=category.id||''; $('#modalForm').dataset.childId=category.childId||currentChildId||''; $('#modalForm').dataset.sort=category.sort||''; $('#modalForm').dataset.createdAt=category.createdAt||'';
+}
+
+async function handleAction(action,el) {
+  const id=el.dataset.id;
+  if(action==='close-modal'){closeModal();return;}
+  if(action==='show-active'){showArchived=false;renderHome();return;}
+  if(action==='show-archived'){showArchived=true;renderHome();return;}
+  if(action==='open-child'){currentChildId=id;childTab='ledger';selectedMonth=thisMonth();await ensureChildCategories(id);render();return;}
+  if(action==='back-home'){currentChildId=null;renderHome();return;}
+  if(action==='add-child'){childForm();return;}
+  if(action==='edit-child'){const c=state.children.find(x=>x.id===id);if(c)childForm(c);return;}
+  if(action==='archive-child'||action==='restore-child'){
+    const c=state.children.find(x=>x.id===id);if(!c)return;
+    if(action==='archive-child'&&!confirm(`確定將「${c.name}」設為已離托？歷史紀錄會完整保留。`))return;
+    await apiMutation([{kind:'saveChild',data:{...c,status:action==='archive-child'?'archived':'active',archivedAt:action==='archive-child'?new Date().toISOString():''}}]);
+    showToast(action==='archive-child'?'已移至已離托名單':'已恢復收托');return;
+  }
+  if(action==='child-tab'){childTab=el.dataset.tab;if(childTab==='month'&&selectedMonth==='all')selectedMonth=thisMonth();render();return;}
+  if(action==='add-transaction'){transactionForm(el.dataset.type||'income');return;}
+  if(action==='edit-transaction'){const r=state.transactions.find(x=>x.id===id);if(r)transactionForm(r.type,r);return;}
+  if(action==='delete-transaction'){
+    if(!confirm('確定刪除這筆收支紀錄？'))return;
+    await apiMutation([{kind:'deleteTransaction',data:{id}}]);showToast('收支紀錄已刪除');return;
+  }
+  if(action==='add-note'){noteForm();return;}
+  if(action==='edit-note'){const n=state.notes.find(x=>x.id===id);if(n)noteForm(n);return;}
+  if(action==='delete-note'){
+    if(!confirm('確定刪除這筆簡易記事？'))return;
+    await apiMutation([{kind:'deleteNote',data:{id}}]);showToast('記事已刪除');return;
+  }
+  if(action==='settings'){currentChildId=null;renderSettings();return;}
+  if(action==='manage-categories'){if(!currentChildId){chooseChildCategoryManager();}else categoryManager();return;}
+  if(action==='choose-category-child'){currentChildId=id;await ensureChildCategories(id);categoryManager();return;}
+  if(action==='new-category'){editCategoryForm({type:el.dataset.type,childId:currentChildId});return;}
+  if(action==='edit-category'){const c=state.categories.find(x=>x.id===id);if(c)editCategoryForm(c);return;}
+  if(action==='deactivate-category'){
+    const c=state.categories.find(x=>x.id===id);if(!c)return;
+    if(!confirm(`確定停用「${c.name}」？過去紀錄不會被刪除。`))return;
+    await apiMutation([{kind:'deactivateCategory',data:{id}}]);categoryManager();showToast('項目已停用');return;
+  }
+  if(action==='move-category'){
+    const c=state.categories.find(x=>x.id===id);if(!c)return;
+    const group=state.categories.filter(x=>String(x.childId||'')===String(currentChildId)&&x.type===c.type&&x.active!==false&&x.active!=='false').sort((a,b)=>Number(a.sort)-Number(b.sort));
+    const idx=group.findIndex(x=>x.id===id),other=group[idx+Number(el.dataset.dir)];if(!other)return;
+    const a={...c,sort:Number(other.sort)},b={...other,sort:Number(c.sort)};
+    await apiMutation([{kind:'saveCategory',data:a},{kind:'saveCategory',data:b}]);categoryManager();return;
+  }
+  if(action==='cloud-backup'){
+    const r=await api('backup');if(!r.ok)throw new Error(r.message||r.error||'雲端備份失敗');showToast(r.message||'雲端備份完成');return;
+  }
+  if(action==='cloud-restore'){
+    if(!confirm('雲端還原會以雲端備份覆蓋目前總控試算表中的資料。確定繼續？'))return;
+    const r=await api('restoreCloud');if(!r.ok)throw new Error(r.error||'雲端還原失敗');state=normalizeState(r.state||{});currentChildId=null;render();showToast(r.message||'雲端還原完成');return;
+  }
+  if(action==='local-backup'){await localBackup();return;}
+  if(action==='local-restore'){$('#localFileInput').click();return;}
+  if(action==='install'){
+    if(deferredInstallPrompt){deferredInstallPrompt.prompt();const choice=await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;showToast(choice?.outcome==='accepted'?'已接受安裝':'已取消安裝');}
+    else showToast('可使用瀏覽器選單中的「安裝應用程式」或「加到主畫面」。');
+  }
+}
+
+async function handleFormSubmit(form) {
+  const fd=new FormData(form);const data=Object.fromEntries(fd.entries());
+  if(form.dataset.form==='child'){
+    const isNew=!form.dataset.id;
+    const id=form.dataset.id||uid('child');
+    const old=state.children.find(c=>c.id===id)||{};
+    const ops=[{kind:'saveChild',data:{...old,id,name:data.name.trim(),memo:data.memo||'',status:form.dataset.status||'active'}}];
+    if(isNew){
+      const templates=state.categories.filter(c=>String(c.childId||'')==='*'&&c.active!==false&&c.active!=='false');
+      templates.forEach(c=>ops.push({kind:'saveCategory',data:{id:uid('cat'),childId:id,type:c.type,name:c.name,sort:c.sort,active:true}}));
+    }
+    await apiMutation(ops);
+    closeModal();showToast('孩童資料已儲存');return;
+  }
+  if(form.dataset.form==='transaction'){
+    const childId=form.dataset.childId;const id=form.dataset.id||uid('tx');
+    const category=state.categories.find(c=>c.id===data.categoryId);
+    if(!category)throw new Error('請先在設定中建立可用的收支項目。');
+    const old=state.transactions.find(t=>t.id===id)||{};
+    const isGift=category.id==='cat_gift'||category.name==='禮金';
+    const amount=Number(data.amount||0);
+    if(!isGift&&!String(data.amount||'').trim())throw new Error('請填寫金額。');
+    const tx={...old,id,childId,date:data.date,type:data.type,categoryId:category.id,category:category.name,amount,paymentMethod:data.paymentMethod||'',note:data.note||'',giftFestival:isGift?(data.giftFestival||''):'',giftCash:isGift?amount:0,giftItemName:isGift?(data.giftItemName||''):'',giftItemValue:isGift?Number(data.giftItemValue||0):0};
+    if(isGift&&amount===0&&!tx.giftItemName)throw new Error('禮金請至少填寫現金金額或禮品名稱。');
+    await apiMutation([{kind:'saveTransaction',data:tx}]);
+    closeModal();showToast('收支紀錄已儲存');return;
+  }
+  if(form.dataset.form==='note'){
+    const childId=form.dataset.childId;const id=form.dataset.id||uid('note');
+    const start=data.startTime||'',end=data.endTime||'',mins=durationMinutes(start,end);
+    const old=state.notes.find(n=>n.id===id)||{};
+    const note={...old,id,childId,date:data.date,startTime:start,endTime:end,durationMinutes:mins,type:data.type,note:data.note||''};
+    await apiMutation([{kind:'saveNote',data:note}]);closeModal();showToast('簡易記事已儲存');return;
+  }
+  if(form.dataset.form==='category'){
+    const id=form.dataset.id||uid('cat');const type=form.querySelector('[name="type"]').value;
+    const old=state.categories.find(c=>c.id===id)||{};
+    const group=state.categories.filter(c=>String(c.childId||'')===String(form.dataset.childId||currentChildId)&&c.type===type&&c.active!==false&&c.active!=='false');
+    const category={...old,id,childId:form.dataset.childId||currentChildId,type,name:data.name.trim(),sort:old.sort||((group.length+1)*10),active:true};
+    await apiMutation([{kind:'saveCategory',data:category}]);closeModal();categoryManager();showToast('項目已儲存');return;
+  }
+}
+
+async function localBackup() {
+  const result=await api('bootstrap');if(!result.ok)throw new Error(result.error||'讀取資料失敗');
+  const snapshot={app:'工作室收入記帳',version:1,exportedAt:new Date().toISOString(),state:result.state};
+  const blob=new Blob([JSON.stringify(snapshot,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`工作室收入記帳_本機備份_${today()}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);showToast('本機備份檔已下載');
+}
+async function localRestore(file) {
+  const parsed=JSON.parse(await file.text());
+  if(!parsed||!parsed.state||parsed.app!=='工作室收入記帳')throw new Error('這不是「工作室收入記帳」的備份檔。');
+  const s=normalizeState(parsed.state);
+  const ops=[];
+  s.children.forEach(data=>ops.push({kind:'saveChild',data}));
+  s.categories.forEach(data=>ops.push({kind:'saveCategory',data}));
+  s.transactions.forEach(data=>ops.push({kind:'saveTransaction',data}));
+  s.notes.forEach(data=>ops.push({kind:'saveNote',data}));
+  Object.entries(s.settings).forEach(([key,value])=>ops.push({kind:'saveSetting',data:{key,value}}));
+  if(!ops.length){showToast('備份檔沒有可匯入的資料');return;}
+  if(!confirm(`準備合併匯入 ${ops.length} 筆資料。現有資料不會被清除，識別碼相同的項目會更新。確定繼續？`))return;
+  const batchSize=3;
+  for(let i=0;i<ops.length;i+=batchSize){await apiMutation(ops.slice(i,i+batchSize));}
+  showToast(`本機資料匯入完成，共處理 ${ops.length} 筆`);
+}
+
+function showConnectionError(message) {
+  $('#appRoot').innerHTML=`<div class="lock-wrap"><img src="./ico.png" alt="工作室收入記帳"><h2>工作室收入記帳</h2><p>${esc(message||'目前無法連接雲端資料。請確認網路及 GAS 部署設定。')}</p><button class="primary" style="width:100%" id="retryConnect">重新連線</button></div>`;
+}
+
+// 全域事件委派
+$('#appRoot').addEventListener('click', async e=>{
+  const target=e.target.closest('[data-action]');if(!target)return;
+  if(target.dataset.action==='close-modal'&&e.target.closest('.modal'))return;
+  try{await handleAction(target.dataset.action,target);}catch(err){showToast(err.message||String(err));}
+});
+$('#modalRoot').addEventListener('click', async e=>{
+  if(e.target.classList.contains('modal-backdrop')){closeModal();return;}
+  const target=e.target.closest('[data-action]');if(!target)return;
+  if(target.dataset.action==='close-modal'){closeModal();return;}
+  try{await handleAction(target.dataset.action,target);}catch(err){showToast(err.message||String(err));}
+});
+document.addEventListener('submit',async e=>{
+  if(e.target.id==='modalForm'){
+    e.preventDefault();const btn=e.target.querySelector('[type="submit"]');setBusy(btn,true,'儲存中…');
+    try{await handleFormSubmit(e.target);}catch(err){showToast(err.message||String(err));}finally{setBusy(btn,false);}
+  }
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='ledgerMonth'){selectedMonth=e.target.value;render();}
+  if(e.target.id==='monthPicker'){selectedMonth=e.target.value||thisMonth();render();}
+  if(e.target.id==='noteMonth'){selectedMonth=e.target.value;render();}
+  if(e.target.id==='localFileInput'&&e.target.files?.[0]){localRestore(e.target.files[0]).catch(err=>showToast(err.message||String(err))).finally(()=>e.target.value='');}
+});
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;});
+window.addEventListener('online',()=>showToast('網路已恢復'));
+window.addEventListener('offline',()=>showToast('目前離線，雲端資料功能暫時無法使用'));
+
+// 動態建立 Web App Manifest。ico.png 請與 index.html 放在同一個 GitHub Pages 資料夾。
+(function createManifest(){
+  const manifest={name:APP_NAME,short_name:'工作室記帳',description:'孩童收支、禮金與簡易記事管理',start_url:location.href.split('#')[0],scope:new URL('.',location.href).pathname,display:'standalone',background_color:'#fffaf0',theme_color:'#fff4d6',icons:[{src:new URL('./ico-192.png',location.href).href,sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:new URL('./ico.png',location.href).href,sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  $('#dynamicManifest').href=URL.createObjectURL(blob);
+})();
+
+// 單檔 HTML 無法合法註冊 Blob URL 作為 Service Worker（瀏覽器要求同源 HTTPS 腳本網址）。
+// 因此此版保留動態 Manifest 與安裝入口；離線快取需日後額外提供同源 sw.js 才能完整啟用。
+document.addEventListener('click', async e=>{
+  if(e.target && e.target.id==='retryConnect'){
+    e.target.disabled=true;e.target.textContent='連線中…';
+    try{await loadState(false);}catch(err){showConnectionError(err.message||'雲端連線失敗，請檢查 GAS 部署設定。');}
+  }
+});
+
+// 開啟程式時直接連接雲端，不要求使用者輸入登入密碼。
+(async function start(){
+  try{await loadState(false);}catch(err){showConnectionError(err.message||'雲端連線失敗，請檢查 GAS 部署設定。');}
+})();
+</script>
+</body>
+</html>
