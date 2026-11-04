@@ -13,6 +13,143 @@
 :root{--ink:#493528;--muted:#8c7868;--cream:#fffaf0;--paper:#fff;--gold:#f7b928;--orange:#f18b37;--pink:#f47d91;--green:#78a86d;--line:#f0dfc2;--shadow:0 8px 24px rgba(103,69,30,.09);--danger:#c85d56}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fff3d2 0,#fffaf1 270px,#fffaf1 100%);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:var(--ink);min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.app{max-width:980px;margin:auto;padding:18px 18px 44px}.topbar{display:flex;align-items:center;gap:13px;margin:2px 0 18px}.logo{width:64px;height:64px;object-fit:cover;border-radius:18px;box-shadow:0 4px 12px #8e5b2425}.brand{flex:1}.brand h1{margin:0;font-size:23px;letter-spacing:.04em}.brand p{margin:4px 0 0;color:#9a6b35;font-size:13px}.top-actions{display:flex;gap:8px;align-items:center}.icon-btn{background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px 12px;color:var(--ink);box-shadow:0 3px 8px #86531a10}.statusline{font-size:12px;color:var(--muted);margin:0 0 14px;padding-left:4px}.panel{background:var(--paper);border:1px solid #f2e5cf;border-radius:20px;padding:18px;box-shadow:var(--shadow);margin-bottom:15px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}.section-head h2,.section-head h3{margin:0;font-size:18px}.subtle{font-size:13px;color:var(--muted)}.primary{background:linear-gradient(135deg,#f6b72d,#f18b37);color:#fff;font-weight:750;border-radius:13px;padding:11px 16px;box-shadow:0 5px 12px #eea22b35}.secondary{background:#fff3d7;color:#86551d;border:1px solid #f4d89b;border-radius:12px;padding:10px 14px;font-weight:650}.soft{background:#fff8ec;color:#795b3a;border:1px solid #f2e6d4;border-radius:11px;padding:8px 11px}.danger{background:#fff0ed;color:#b44c45;border:1px solid #f3d3ce;border-radius:11px;padding:8px 11px}.small{font-size:13px;padding:7px 10px}.children-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:12px}.child-card{border:1px solid #f1dfbd;border-radius:17px;padding:15px;background:linear-gradient(145deg,#fffdf8,#fff6e6);text-align:left;display:flex;gap:12px;align-items:center;min-height:86px;color:var(--ink);transition:.15s}.child-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.child-avatar{width:48px;height:48px;display:grid;place-items:center;background:#ffe8a5;border-radius:15px;font-size:25px;flex:none}.child-card strong{display:block;font-size:17px}.child-card small{color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:30px 10px;line-height:1.8}.tab-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}.tab{padding:9px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);color:#806d5b;font-weight:650}.tab.active{background:#ffedbd;color:#7b4f13;border-color:#f5d17e}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 16px}.summary-card{border:1px solid #f2e3c9;border-radius:15px;padding:13px;background:#fffdf9}.summary-card span{display:block;font-size:12px;color:var(--muted)}.summary-card strong{font-size:20px;display:block;margin-top:5px;overflow-wrap:anywhere}.income{color:#57914f}.expense{color:#c46d58}.net{color:#9a6a15}.record-list{display:flex;flex-direction:column;gap:9px}.record{border:1px solid #f1e7d8;border-radius:14px;padding:12px 13px;display:flex;align-items:center;gap:12px;background:#fff}.record-main{flex:1;min-width:0}.record-title{font-weight:750}.record-meta{font-size:12px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}.record-amount{font-weight:800;white-space:nowrap}.record-actions{display:flex;gap:5px}.month-picker{border:1px solid var(--line);border-radius:11px;padding:8px 10px;background:white;color:var(--ink)}.category-breakdown{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px 0;border-bottom:1px dashed #eee1cf}.category-breakdown:last-child{border-bottom:0}.note-card{background:#fffaf1;border:1px solid #f2e3c9;border-left:4px solid #efb33c;border-radius:13px;padding:12px}.note-card h4{margin:0 0 5px}.note-card p{margin:5px 0;color:#75614f;font-size:13px}.toolbar{display:flex;flex-wrap:wrap;gap:8px}.settings-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.setting-tile{border:1px solid var(--line);background:#fffdf8;border-radius:15px;padding:14px;text-align:left;color:var(--ink)}.setting-tile strong{display:block;margin-bottom:4px}.category-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f3eadc}.category-row:last-child{border-bottom:0}.category-name{flex:1}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}.field label{font-size:13px;font-weight:700;color:#76583d}.field input,.field select,.field textarea{width:100%;border:1px solid #e9dbc5;border-radius:11px;padding:11px 12px;background:#fffdf9;color:var(--ink);outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:#e8ac36;box-shadow:0 0 0 3px #f7d99044}.field textarea{min-height:78px;resize:vertical}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.modal-backdrop{position:fixed;inset:0;background:#36231666;display:flex;align-items:center;justify-content:center;padding:15px;z-index:20}.modal{width:min(540px,100%);max-height:92vh;overflow:auto;background:#fffdf8;border-radius:20px;padding:20px;box-shadow:0 18px 60px #3b251c44}.modal h3{margin:0 0 16px;font-size:20px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:15px}.helper{font-size:12px;color:var(--muted);line-height:1.6}.duration{display:inline-block;background:#fff0c2;color:#825917;border-radius:10px;padding:7px 10px;font-weight:750;font-size:13px}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:11px 16px;border-radius:12px;background:#4e3a2c;color:white;box-shadow:var(--shadow);z-index:50;max-width:90vw;text-align:center;font-size:14px}.hidden{display:none!important}.lock-wrap{max-width:430px;margin:8vh auto;background:white;border-radius:22px;padding:25px;box-shadow:var(--shadow);border:1px solid var(--line)}.lock-wrap img{width:82px;height:82px;border-radius:20px;display:block;margin:0 auto 12px}.lock-wrap h2{text-align:center;margin:0 0 6px}.lock-wrap p{text-align:center;color:var(--muted);font-size:13px;margin:0 0 20px}.footer{text-align:center;color:#aa9277;font-size:11px;margin:22px 0 0}.divider{border:0;border-top:1px solid #f1e6d5;margin:16px 0}
 @media(max-width:620px){.app{padding:12px 12px 32px}.topbar{gap:10px}.logo{width:54px;height:54px;border-radius:15px}.brand h1{font-size:19px}.brand p{font-size:11px}.top-actions{gap:5px}.icon-btn{padding:9px}.panel{padding:15px;border-radius:17px}.summary-grid{gap:7px}.summary-card{padding:10px}.summary-card strong{font-size:17px}.record{align-items:flex-start;flex-wrap:wrap}.record-actions{width:100%;justify-content:flex-end}.form-grid{grid-template-columns:1fr}.section-head{align-items:flex-start}}
+
+
+/* ===== 精緻按鈕與介面層次 ===== */
+:root{
+  --gold-deep:#d98518;
+  --orange-deep:#dc6c2f;
+  --pink-deep:#dd647e;
+  --green-deep:#558d54;
+  --button-shadow:0 5px 0 rgba(180,112,29,.24),0 10px 20px rgba(123,76,28,.12);
+}
+body{
+  background:
+    radial-gradient(circle at 8% 4%,rgba(255,205,90,.22),transparent 25rem),
+    radial-gradient(circle at 94% 17%,rgba(255,145,132,.14),transparent 22rem),
+    linear-gradient(180deg,#fff0c9 0,#fffaf1 300px,#fffaf1 100%);
+}
+button{
+  position:relative;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  transition:transform .16s ease,box-shadow .16s ease,filter .16s ease,background .16s ease;
+  outline:none;
+}
+button:focus-visible{outline:3px solid rgba(238,166,43,.45);outline-offset:3px}
+button:disabled{cursor:not-allowed;opacity:.58;filter:saturate(.65);transform:none!important;box-shadow:none!important}
+.primary{
+  color:#fff;
+  background:linear-gradient(135deg,#ffc83f 0%,#ffa12f 48%,#f17d39 100%);
+  border:1px solid rgba(255,255,255,.72);
+  border-radius:15px;
+  padding:12px 17px;
+  font-weight:850;
+  letter-spacing:.02em;
+  text-shadow:0 1px 1px rgba(125,67,15,.18);
+  box-shadow:0 5px 0 #d77a28,0 9px 18px rgba(216,126,39,.22),inset 0 1px 0 rgba(255,255,255,.5);
+}
+.primary:hover{transform:translateY(-2px);filter:saturate(1.08);box-shadow:0 7px 0 #d77a28,0 13px 22px rgba(216,126,39,.25),inset 0 1px 0 rgba(255,255,255,.55)}
+.primary:active{transform:translateY(3px) scale(.985);box-shadow:0 2px 0 #d77a28,0 4px 9px rgba(216,126,39,.16),inset 0 2px 5px rgba(130,67,16,.12)}
+.secondary{
+  color:#865018;
+  background:linear-gradient(180deg,#fff8e8,#ffedc7);
+  border:1px solid #f2d18c;
+  border-radius:14px;
+  padding:11px 15px;
+  font-weight:800;
+  box-shadow:0 4px 0 #e9d29f,0 7px 14px rgba(135,93,36,.08),inset 0 1px 0 #fff;
+}
+.secondary:hover{transform:translateY(-2px);background:linear-gradient(180deg,#fffaf0,#ffe7b0);box-shadow:0 6px 0 #e9d29f,0 10px 16px rgba(135,93,36,.12)}
+.secondary:active{transform:translateY(2px);box-shadow:0 1px 0 #e9d29f}
+.soft{
+  color:#76563b;
+  background:linear-gradient(180deg,#fff,#fff8ed);
+  border:1px solid #eadcc8;
+  border-radius:12px;
+  padding:9px 12px;
+  font-weight:750;
+  box-shadow:0 3px 0 #e8dfd2,0 5px 10px rgba(94,70,44,.055);
+}
+.soft:hover{transform:translateY(-1px);background:#fffdf8;box-shadow:0 4px 0 #e8dfd2,0 7px 12px rgba(94,70,44,.08)}
+.soft:active{transform:translateY(2px);box-shadow:0 1px 0 #e8dfd2}
+.danger{
+  color:#b64b4e;
+  background:linear-gradient(180deg,#fff5f2,#ffe9e5);
+  border:1px solid #f2cbc4;
+  border-radius:12px;
+  padding:9px 12px;
+  font-weight:800;
+  box-shadow:0 3px 0 #eac9c2,0 5px 10px rgba(175,79,69,.07);
+}
+.danger:hover{transform:translateY(-1px);background:linear-gradient(180deg,#fff8f5,#ffdfd8)}
+.danger:active{transform:translateY(2px);box-shadow:0 1px 0 #eac9c2}
+.small{font-size:13px;padding:8px 11px;border-radius:11px}
+.icon-btn{
+  min-width:44px;min-height:44px;
+  display:inline-grid;place-items:center;
+  background:linear-gradient(180deg,#fff,#fff8ea);
+  border:1px solid #f0dfc2;border-radius:15px;
+  color:#835c2f;box-shadow:0 4px 0 #ebdfcc,0 7px 13px rgba(103,69,30,.08);
+}
+.icon-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #ebdfcc,0 10px 16px rgba(103,69,30,.1)}
+.icon-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #ebdfcc}
+.install-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:44px;padding:0 15px;border-radius:15px;
+  color:#fff;background:linear-gradient(135deg,#f7bd2f,#f18a39 72%,#e97854);
+  border:1px solid rgba(255,255,255,.75);font-size:13px;font-weight:900;letter-spacing:.02em;
+  box-shadow:0 4px 0 #d77931,0 8px 15px rgba(216,126,39,.2),inset 0 1px 0 rgba(255,255,255,.45);
+}
+.install-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #d77931,0 11px 18px rgba(216,126,39,.24)}
+.install-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #d77931}
+.install-symbol{font-size:19px;line-height:1;font-weight:900}
+.panel{
+  border:1px solid rgba(239,220,189,.9);
+  border-radius:23px;
+  box-shadow:0 9px 26px rgba(115,78,35,.085),inset 0 1px 0 rgba(255,255,255,.9);
+}
+.section-head h2,.section-head h3{letter-spacing:.015em}
+.child-card{
+  position:relative;overflow:hidden;
+  border:1px solid #f1d8a8;
+  border-radius:19px;
+  background:linear-gradient(145deg,#fffefa 0%,#fff8e9 58%,#fff0d5 100%);
+  box-shadow:0 4px 0 #f0dfc2,0 8px 16px rgba(117,78,36,.075),inset 0 1px 0 #fff;
+}
+.child-card:after{content:"›";font-size:25px;font-weight:800;color:#d89a38;margin-left:auto;opacity:.8;transition:transform .16s ease}
+.child-card:hover{transform:translateY(-3px);border-color:#eec56f;box-shadow:0 7px 0 #efd9ad,0 13px 20px rgba(117,78,36,.11),inset 0 1px 0 #fff}
+.child-card:hover:after{transform:translateX(3px)}
+.child-card:active{transform:translateY(2px) scale(.99);box-shadow:0 2px 0 #efd9ad}
+.child-avatar{background:linear-gradient(145deg,#ffe99e,#ffd36b);box-shadow:inset 0 2px 3px rgba(255,255,255,.7),0 3px 8px rgba(196,139,42,.12)}
+.tab{padding:10px 16px;border:1px solid #eedfc9;background:linear-gradient(180deg,#fff,#fffaf2);box-shadow:0 3px 0 #ede3d5,0 5px 10px rgba(96,70,41,.045);transition:all .16s ease}
+.tab:hover{transform:translateY(-1px);border-color:#e9c779}
+.tab:active{transform:translateY(1px);box-shadow:0 1px 0 #ede3d5}
+.tab.active{color:#754707;border-color:#f2c75f;background:linear-gradient(135deg,#ffe9a5,#ffd36c);box-shadow:0 3px 0 #e9b84a,0 7px 13px rgba(223,166,47,.16),inset 0 1px 0 rgba(255,255,255,.75)}
+.setting-tile{
+  border:1px solid #f0dfc2;
+  background:linear-gradient(145deg,#fffefa,#fff7e9);
+  border-radius:18px;padding:16px;text-align:left;color:var(--ink);
+  box-shadow:0 4px 0 #f0e4d0,0 8px 14px rgba(105,74,39,.06),inset 0 1px 0 #fff;
+}
+.setting-tile:hover{transform:translateY(-2px);border-color:#eecb83;box-shadow:0 6px 0 #f0e4d0,0 12px 18px rgba(105,74,39,.1)}
+.setting-tile:active{transform:translateY(2px);box-shadow:0 1px 0 #f0e4d0}
+.summary-card{box-shadow:inset 0 3px 0 rgba(246,190,83,.38),0 4px 12px rgba(111,78,42,.04);background:linear-gradient(145deg,#fffefa,#fffaf1)}
+.record,.note-card{box-shadow:0 3px 10px rgba(103,69,30,.045)}
+.record-actions{gap:8px}
+.field input,.field select,.field textarea,.month-picker{box-shadow:inset 0 1px 2px rgba(103,69,30,.035);transition:border-color .15s ease,box-shadow .15s ease}
+.modal{border:1px solid #f0dfc2;box-shadow:0 22px 65px rgba(57,37,22,.28),inset 0 1px 0 #fff}
+.modal-actions{padding-top:4px}
+.install-guide{color:#68503a;line-height:1.8;font-size:14px}.install-guide ol{padding-left:22px}.install-guide li{margin:8px 0}.install-guide strong{color:#a65e1d}
+.toast{box-shadow:0 9px 25px rgba(48,34,23,.22);border:1px solid rgba(255,255,255,.15)}
+@media(max-width:620px){
+  .install-btn{min-height:42px;padding:0 11px;font-size:12px;border-radius:14px}
+  .primary,.secondary{min-height:42px}
+  .tab{padding:9px 13px}
+  .child-card{min-height:82px}
+}
+@media(prefers-reduced-motion:reduce){button{transition:none!important}}
+
 </style>
 </head>
 <body>
@@ -102,13 +239,14 @@ function shell(content) {
       <img class="logo" src="./ico.png" alt="工作室收入記帳圖示" onerror="this.style.display='none'">
       <div class="brand"><h1>${APP_NAME}</h1><p>把每一份照顧與收穫，好好記錄下來</p></div>
       <div class="top-actions">
-        <button class="icon-btn" data-action="install" title="安裝到手機">⬇️</button>
+        <button class="install-btn" data-action="install" title="安裝工作室收入記帳"><span class="install-symbol">⇩</span><span>安裝 APP</span></button>
         <button class="icon-btn" data-action="settings" title="設定與備份">⚙️</button>
       </div>
     </header>
     <div class="statusline">☁️ 雲端同步中｜資料保存於專用 Google 試算表</div>
     ${content}
     <div class="footer">工作室收入記帳・專用雲端資料</div>`;
+  updateInstallButton();
 }
 function renderHome() {
   const active=state.children.filter(c=>c.status!=='archived').sort((a,b)=>String(a.name).localeCompare(String(b.name),'zh-TW'));
@@ -357,8 +495,19 @@ async function handleAction(action,el) {
   if(action==='local-backup'){await localBackup();return;}
   if(action==='local-restore'){$('#localFileInput').click();return;}
   if(action==='install'){
-    if(deferredInstallPrompt){deferredInstallPrompt.prompt();const choice=await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;showToast(choice?.outcome==='accepted'?'已接受安裝':'已取消安裝');}
-    else showToast('可使用瀏覽器選單中的「安裝應用程式」或「加到主畫面」。');
+    if(deferredInstallPrompt){
+      const promptEvent=deferredInstallPrompt;
+      deferredInstallPrompt=null;
+      promptEvent.prompt();
+      const choice=await promptEvent.userChoice;
+      showToast(choice?.outcome==='accepted'?'已接受安裝':'已取消安裝');
+      updateInstallButton();
+    }else if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
+      openModal('加入 iPhone／iPad 主畫面',`<div class="install-guide"><p>請使用 Safari 開啟本程式，再依照以下步驟加入主畫面：</p><ol><li>點擊 Safari 工具列的<strong>分享</strong>圖示。</li><li>往下找到<strong>加入主畫面</strong>。</li><li>確認名稱後，按右上角<strong>新增</strong>。</li></ol><p class="helper">加入後即可從主畫面像 APP 一樣開啟。iOS 的加入主畫面流程由 Safari 系統選單提供。</p></div><div class="modal-actions"><button class="primary" data-action="close-modal">知道了</button></div>`);
+    }else{
+      openModal('目前尚未提供安裝提示',`<div class="install-guide"><p>瀏覽器目前尚未提供真正的 PWA 安裝提示。</p><ol><li>請確認使用 HTTPS 網址開啟本程式。</li><li>保持網頁開啟並操作一會兒，再按「安裝 APP」。</li><li>當 Chrome 提供原生安裝視窗時，按下安裝即可。</li></ol><p class="helper">若尚未出現原生安裝提示，請先不要把一般「新增至主畫面」捷徑當成已完成 APP 安裝。</p></div><div class="modal-actions"><button class="primary" data-action="close-modal">知道了</button></div>`);
+    }
+    return;
   }
 }
 
@@ -456,19 +605,58 @@ document.addEventListener('change',e=>{
   if(e.target.id==='noteMonth'){selectedMonth=e.target.value;render();}
   if(e.target.id==='localFileInput'&&e.target.files?.[0]){localRestore(e.target.files[0]).catch(err=>showToast(err.message||String(err))).finally(()=>e.target.value='');}
 });
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;});
+function isStandaloneApp(){
+  return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+}
+function updateInstallButton(){
+  document.querySelectorAll('[data-action="install"]').forEach(btn=>{
+    btn.classList.toggle('hidden',isStandaloneApp());
+    btn.setAttribute('aria-label',deferredInstallPrompt?'安裝工作室收入記帳':'安裝工作室收入記帳或查看安裝方式');
+  });
+}
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  updateInstallButton();
+});
+window.addEventListener('appinstalled',()=>{
+  deferredInstallPrompt=null;
+  updateInstallButton();
+  showToast('工作室收入記帳已安裝完成');
+});
 window.addEventListener('online',()=>showToast('網路已恢復'));
 window.addEventListener('offline',()=>showToast('目前離線，雲端資料功能暫時無法使用'));
+const standaloneQuery=window.matchMedia?window.matchMedia('(display-mode: standalone)'):null;
+if(standaloneQuery){
+  if(standaloneQuery.addEventListener)standaloneQuery.addEventListener('change',updateInstallButton);
+  else if(standaloneQuery.addListener)standaloneQuery.addListener(updateInstallButton);
+}
 
-// 動態建立 Web App Manifest。ico.png 請與 index.html 放在同一個 GitHub Pages 資料夾。
+// 單檔 PWA：沿用先前成功範例的「動態 Manifest Blob + HTTPS 圖示」流程。
+// 不建立額外 manifest.json，也不將 blob: URL 註冊為 Service Worker。
 (function createManifest(){
-  const manifest={name:APP_NAME,short_name:'工作室記帳',description:'孩童收支、禮金與簡易記事管理',start_url:location.href.split('#')[0],scope:new URL('.',location.href).pathname,display:'standalone',background_color:'#fffaf0',theme_color:'#fff4d6',icons:[{src:new URL('./ico-192.png',location.href).href,sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:new URL('./ico.png',location.href).href,sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
-  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-  $('#dynamicManifest').href=URL.createObjectURL(blob);
+  const baseUrl=new URL('.',window.location.href);
+  const startUrl=new URL(window.location.href);
+  startUrl.hash='';
+  const manifest={
+    id:baseUrl.href,
+    name:APP_NAME,
+    short_name:'工作室記帳',
+    description:'孩童收支、禮金與簡易記事管理',
+    start_url:startUrl.href,
+    scope:baseUrl.href,
+    display:'standalone',
+    background_color:'#fffaf0',
+    theme_color:'#f7b928',
+    icons:[
+      {src:new URL('ico.png',baseUrl).href,sizes:'512x512',type:'image/png',purpose:'any maskable'},
+      {src:new URL('ico-192.png',baseUrl).href,sizes:'192x192',type:'image/png',purpose:'any maskable'}
+    ]
+  };
+  const manifestBlob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  const manifestUrl=URL.createObjectURL(manifestBlob);
+  $('#dynamicManifest').setAttribute('href',manifestUrl);
 })();
-
-// 單檔 HTML 無法合法註冊 Blob URL 作為 Service Worker（瀏覽器要求同源 HTTPS 腳本網址）。
-// 因此此版保留動態 Manifest 與安裝入口；離線快取需日後額外提供同源 sw.js 才能完整啟用。
 document.addEventListener('click', async e=>{
   if(e.target && e.target.id==='retryConnect'){
     e.target.disabled=true;e.target.textContent='連線中…';
