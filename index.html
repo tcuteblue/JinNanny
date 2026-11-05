@@ -231,6 +231,50 @@ button:disabled{cursor:not-allowed;opacity:.58;filter:saturate(.65);transform:no
 .statusline[data-kind="offline"]{color:#b15d39}
 @media(max-width:380px){.home-controls{gap:5px}.home-controls button{font-size:12px;padding:7px 3px}}
 
+
+/* 收支分析圖表（純前端 CSS，無外部圖表套件） */
+.analysis-chart-card{border:1px solid #f0e3cf;border-radius:16px;padding:14px;background:#fffdf9;margin:12px 0}
+.analysis-chart-card h3{font-size:15px;margin:0 0 12px}
+.analysis-chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.chart-row{margin:10px 0}
+.chart-row-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:6px}
+.chart-row-head span{min-width:0;overflow-wrap:anywhere}
+.chart-row-head strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+.chart-track{height:11px;background:#f4eee4;border-radius:99px;overflow:hidden}
+.chart-fill{height:100%;border-radius:99px;min-width:0;transition:width .25s ease}
+.chart-fill.income,.trend-bar.income{background:linear-gradient(90deg,#9ac98d,#57914f)}
+.chart-fill.expense,.trend-bar.expense{background:linear-gradient(90deg,#e9a18e,#c46d58)}
+.chart-fill.net{background:linear-gradient(90deg,#f6d174,#c18a25)}
+.chart-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:0 0 8px}
+.chart-legend span{display:inline-flex;align-items:center;gap:5px}
+.legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.legend-dot.income{background:#57914f}.legend-dot.expense{background:#c46d58}.legend-dot.net{background:#c18a25}
+.trend-chart{height:160px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;align-items:end;padding:8px 2px 0;border-bottom:1px solid #eadfce}
+.trend-month{height:100%;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px}
+.trend-bars{height:124px;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.trend-bar{width:min(24px,38%);min-height:0;border-radius:6px 6px 2px 2px;position:relative}
+.trend-label{font-size:11px;color:var(--muted);white-space:nowrap}
+.child-chart-row{margin:12px 0}
+.child-chart-title{font-size:13px;font-weight:700;margin-bottom:6px}
+.child-chart-pair{display:grid;grid-template-columns:34px 1fr auto;gap:7px;align-items:center;margin:4px 0;font-size:12px}
+.child-chart-pair .chart-track{height:8px}
+.chart-empty{font-size:12px;color:var(--muted);padding:10px 0}
+.home-settlement-block{border:1px solid #ead8b9;background:linear-gradient(135deg,#fffaf0,#fff3d9);border-radius:17px;padding:14px;margin-top:4px}
+.home-settlement-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.home-settlement-head strong{font-size:15px}
+.home-settlement-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.home-settlement-value{border:1px solid #f0dfc2;background:#fff;border-radius:13px;padding:12px}
+.home-settlement-value span{display:block;font-size:12px;color:var(--muted)}
+.home-settlement-value strong{display:block;margin-top:5px;font-size:20px;overflow-wrap:anywhere}
+.advance-main{min-width:0}
+/* 每月分帳結算 */
+.settlement-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.settlement-card{border:1px solid #f0dfc3;border-radius:15px;padding:14px;background:#fffdf8;margin-top:12px}
+.settlement-card h3{font-size:15px;margin:0 0 10px}
+.settlement-total{font-size:23px;font-weight:850;color:#8a5a16}
+.advance-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #f1e7d8}
+@media(max-width:600px){.analysis-chart-grid{grid-template-columns:1fr}.trend-chart{gap:4px;overflow-x:auto}.trend-bars{gap:3px}.trend-label{font-size:10px}.settlement-grid{grid-template-columns:1fr}.advance-row{grid-template-columns:1fr auto}.advance-row .toolbar{grid-column:1/-1}.home-settlement-head{align-items:flex-start;flex-direction:column}.home-settlement-head button{width:100%}.home-settlement-value strong{font-size:17px}}
+
 </style>
 </head>
 <body>
@@ -258,6 +302,8 @@ let currentChildId = null;
 let currentPage = 'home';
 let analysisChildId = '*';
 let analysisMonth = thisMonth();
+let analysisStartMonth = buildAnalysisMonths(thisMonth(),6)[0];
+let analysisEndMonth = thisMonth();
 let childTab = 'ledger';
 let selectedMonth = thisMonth();
 let showArchived = false;
@@ -298,7 +344,7 @@ function setSyncStatus(message,kind='loading') {
   if(el){el.textContent=message;el.dataset.kind=kind;}
 }
 function routeSnapshot() {
-  return {__studioRoute:true,page:currentPage,childId:currentChildId,childTab,selectedMonth,showArchived,analysisChildId,analysisMonth};
+  return {__studioRoute:true,page:currentPage,childId:currentChildId,childTab,selectedMonth,showArchived,analysisChildId,analysisMonth,analysisStartMonth,analysisEndMonth};
 }
 function pushRouteHistory() {
   try { history.pushState(routeSnapshot(), '', location.href); } catch (_) {}
@@ -317,7 +363,7 @@ function restoreRoute(route) {
   } else {
     currentPage=route.page||'home';currentChildId=route.childId||null;
     childTab=route.childTab||'ledger';selectedMonth=route.selectedMonth||thisMonth();
-    showArchived=!!route.showArchived;analysisChildId=route.analysisChildId||'*';analysisMonth=route.analysisMonth||thisMonth();
+    showArchived=!!route.showArchived;analysisChildId=route.analysisChildId||'*';analysisMonth=route.analysisMonth||thisMonth();analysisStartMonth=route.analysisStartMonth||buildAnalysisMonths(analysisMonth,6)[0];analysisEndMonth=route.analysisEndMonth||analysisMonth;
   }
   render();
 }
@@ -430,6 +476,7 @@ async function withBusy(title,fn,button=null,detail){
 function render() {
   if(currentPage==='analysis'){renderAnalysis();return;}
   if(currentPage==='settings'){renderSettings();return;}
+  if(currentPage==='settlement'){renderSettlement();return;}
   const child = state.children.find(c=>c.id===currentChildId);
   if (currentChildId && child) renderChild(child); else { currentChildId=null; renderHome(); }
 }
@@ -440,8 +487,8 @@ function shell(content) {
       <img class="logo" src="${window.__STUDIO_ICON_512__}" alt="工作室收入記帳圖示">
       <div class="brand"><h1>${APP_NAME}</h1><p>把每一份照顧與收穫，好好記錄下來</p></div>
       <div class="top-actions">
-        <button class="icon-btn" data-action="analysis" title="收支明細分析">📊</button>
         <button class="install-btn" data-action="install" title="安裝工作室收入記帳"><span class="install-symbol">⇩</span><span>安裝 APP</span></button>
+        <button class="icon-btn" data-action="analysis" title="收支明細分析">📊</button>
         <button class="icon-btn" data-action="settings" title="設定與備份">⚙️</button>
       </div>
     </header>
@@ -464,10 +511,16 @@ function renderHome() {
       ${list.length?`<div class="children-grid">${list.map(c=>`<button class="child-card" data-action="open-child" data-id="${esc(c.id)}"><span class="child-avatar">${showArchived?'📁':'🧸'}</span><span><strong>${esc(c.name)}</strong><small>${showArchived?'已離托・點選查看歷史':'點選進入孩童帳務'}</small></span></button>`).join('')}</div>`:`<div class="empty">${showArchived?'目前沒有已離托的孩童。':'尚未新增孩童，按右上方「新增孩童」開始建立資料。'}</div>`}
     </section>
     <section class="panel"><div class="section-head"><div><h3>本月工作室收支概況</h3><div class="subtle">${thisMonth()}</div></div></div>
-      <div class="summary-grid"><div class="summary-card"><span>收入</span><strong class="income">${money(income)}</strong></div><div class="summary-card"><span>支出／退費</span><strong class="expense">${money(expenses)}</strong></div><div class="summary-card"><span>收入淨額</span><strong class="net">${money(income-expenses)}</strong></div></div>
+      <div class="summary-grid"><div class="summary-card"><span>原始收入</span><strong class="income">${money(income)}</strong></div><div class="summary-card"><span>支出／退費</span><strong class="expense">${money(expenses)}</strong></div><div class="summary-card"><span>原始結餘</span><strong class="net">${money(income-expenses)}</strong></div></div>
+      ${renderHomeSettlementSummary(income)}
     </section>
   `);
 }
+function renderHomeSettlementSummary(monthIncome){
+  const month=thisMonth(),d=settlementData(month),c=settlementCalc(month,d);
+  return `<div class="home-settlement-block"><div class="home-settlement-head"><div><strong>🤝 本月分帳概況</strong><div class="helper">依本月收入、分帳規則及雙向代墊即時計算；分帳後收入尚未扣除其他工作室支出</div></div><button class="primary small" data-action="settlement" data-month="${esc(month)}">本月分帳結算</button></div><div class="home-settlement-grid"><div class="home-settlement-value"><span>分帳後工作室收入</span><strong class="income">${money(Number(monthIncome||0)-c.due)}</strong></div><div class="home-settlement-value"><span>同事應付金額</span><strong class="expense">${money(c.due)}</strong></div></div></div>`;
+}
+
 function childRecords(childId, month='') {
   return state.transactions.filter(t=>t.childId===childId&&(!month||String(t.date||'').startsWith(month))).sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.updatedAt).localeCompare(String(a.updatedAt)));
 }
@@ -528,33 +581,165 @@ function renderMonth(child,records) {
     <h3 style="font-size:15px">項目分類小計</h3>${Object.keys(groups).length?Object.entries(groups).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="category-breakdown"><span>${esc(k)}</span><strong>${money(v)}</strong></div>`).join(''):`<div class="empty">這個月份沒有紀錄。</div>`}
     <hr class="divider"><h3 style="font-size:15px">本月逐筆明細</h3>${list.length?`<div class="record-list">${[...list].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(renderTransaction).join('')}</div>`:''}`;
 }
+function renderAnalysisCategoryRows(map,type,total){
+  const entries=Object.entries(map||{}).sort((a,b)=>Number(b[1])-Number(a[1]));
+  if(!entries.length)return '<div class="chart-empty">這個月份沒有相關紀錄。</div>';
+  const max=Math.max(1,...entries.map(x=>Number(x[1])||0));
+  return entries.map(([name,value])=>{
+    const amount=Math.max(0,Number(value)||0);
+    const width=Math.max(0,Math.min(100,amount/max*100));
+    const pct=total>0?amount/total*100:0;
+    return `<div class="chart-row"><div class="chart-row-head"><span>${esc(name)}</span><strong>${money(amount)} <span class="subtle">${pct.toFixed(1)}%</span></strong></div><div class="chart-track"><div class="chart-fill ${type}" style="width:${width}%"></div></div></div>`;
+  }).join('');
+}
+function buildAnalysisMonths(anchor,count=6){
+  const [year,month]=String(anchor||thisMonth()).split('-').map(Number);
+  return Array.from({length:count},(_,i)=>{
+    const d=new Date(year,month-1-(count-1-i),1);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  });
+}
+function monthRangeList(startMonth,endMonth){
+  const s=String(startMonth||thisMonth()).split('-').map(Number),e=String(endMonth||thisMonth()).split('-').map(Number);
+  let y=s[0],m=s[1],ey=e[0],em=e[1];
+  if(!y||!m||!ey||!em)return [thisMonth()];
+  const result=[];let guard=0;
+  while((y<ey||(y===ey&&m<=em))&&guard++<120){result.push(`${y}-${String(m).padStart(2,'0')}`);m++;if(m>12){m=1;y++;}}
+  return result.length?result:[thisMonth()];
+}
+function renderAnalysisTrend(scopeId,startMonth,endMonth){
+  const months=monthRangeList(startMonth,endMonth);
+  const chartMonths=months.length>12?months.slice(-12):months;
+  const rows=chartMonths.map(m=>{
+    const records=state.transactions.filter(r=>String(r.date||'').startsWith(m)&&(scopeId==='*'||String(r.childId)===String(scopeId)));
+    return {month:m,...totals(records)};
+  });
+  const max=Math.max(1,...rows.flatMap(r=>[r.income,r.expense]));
+  return `<div class="analysis-chart-card"><h3>期間內每月收支趨勢</h3><div class="chart-legend"><span><i class="legend-dot income"></i>收入</span><span><i class="legend-dot expense"></i>支出／退費</span></div><div class="trend-chart" style="grid-template-columns:repeat(${rows.length},minmax(0,1fr))">${rows.map(r=>{
+    const ih=r.income?Math.max(2,r.income/max*100):0,eh=r.expense?Math.max(2,r.expense/max*100):0;
+    return `<div class="trend-month"><div class="trend-bars"><div class="trend-bar income" style="height:${ih}%" title="${esc(r.month)} 收入 ${money(r.income)}"></div><div class="trend-bar expense" style="height:${eh}%" title="${esc(r.month)} 支出 ${money(r.expense)}"></div></div><div class="trend-label">${esc(r.month.slice(2).replace('-','/'))}</div></div>`;
+  }).join('')}</div><div class="helper" style="margin-top:8px">${months.length>12?'區間超過 12 個月，趨勢圖顯示最近 12 個月；上方總額、分類及明細仍依完整期間計算。':'依選定的起訖月份逐月比較。'}</div></div>`;
+}
+function renderAnalysisChildChart(byChild){
+  if(!byChild.length)return '<div class="chart-empty">這段期間還沒有孩童收支紀錄。</div>';
+  const max=Math.max(1,...byChild.flatMap(x=>[x.total.income,x.total.expense]));
+  return byChild.map(x=>{
+    const incomeWidth=Math.max(0,Math.min(100,x.total.income/max*100));
+    const expenseWidth=Math.max(0,Math.min(100,x.total.expense/max*100));
+    return `<div class="child-chart-row"><div class="child-chart-title">${esc(x.child.name)}${x.child.status==='archived'?'（已離托）':''}</div><div class="child-chart-pair"><span class="income">收</span><div class="chart-track"><div class="chart-fill income" style="width:${incomeWidth}%"></div></div><strong>${money(x.total.income)}</strong></div><div class="child-chart-pair"><span class="expense">支</span><div class="chart-track"><div class="chart-fill expense" style="width:${expenseWidth}%"></div></div><strong>${money(x.total.expense)}</strong></div></div>`;
+  }).join('');
+}
 function renderAnalysis() {
   currentPage='analysis';currentChildId=null;
-  const month=analysisMonth||thisMonth();
-  const allRecords=state.transactions.filter(r=>String(r.date||'').startsWith(month));
+  let startMonth=analysisStartMonth||buildAnalysisMonths(thisMonth(),6)[0];
+  let endMonth=analysisEndMonth||thisMonth();
+  if(startMonth>endMonth){const temp=startMonth;startMonth=endMonth;endMonth=temp;analysisStartMonth=startMonth;analysisEndMonth=endMonth;}
+  analysisMonth=endMonth;
+  const inRange=r=>{const m=String(r.date||'').slice(0,7);return m>=startMonth&&m<=endMonth;};
+  const allRecords=state.transactions.filter(inRange);
   const selectedRecords=analysisChildId==='*'?allRecords:allRecords.filter(r=>String(r.childId)===String(analysisChildId));
   const t=totals(selectedRecords);
   const group={income:{},expense:{}};
   selectedRecords.forEach(r=>{const type=r.type==='expense'?'expense':'income',name=r.category||'未分類';group[type][name]=(group[type][name]||0)+Number(r.amount||0);});
   const children=state.children.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),'zh-TW'));
-  const byChild=children.map(c=>({child:c,total:totals(allRecords.filter(r=>String(r.childId)===String(c.id)))})).filter(x=>x.total.income||x.total.expense);
-  const scopeName=analysisChildId==='*'?'所有孩童':(children.find(c=>c.id===analysisChildId)?.name||'指定孩童');
+  const byChild=children.map(c=>({child:c,total:totals(selectedRecords.filter(r=>String(r.childId)===String(c.id)))})).filter(x=>x.total.income||x.total.expense);
+  const scopeName=analysisChildId==='*'?'所有孩童':(children.find(c=>String(c.id)===String(analysisChildId))?.name||'指定孩童');
+  const compareMax=Math.max(1,t.income,t.expense);
+  const rangeLabel=startMonth===endMonth?startMonth:`${startMonth} ～ ${endMonth}`;
   shell(`<section class="panel">
-    <div class="section-head"><div><button class="soft small" data-action="back-home">← 返回上一頁</button><h2 style="margin-top:10px">📊 收支明細分析</h2><div class="subtle">可查看個別孩童或所有孩童合計（包含已離托歷史紀錄）</div></div></div>
+    <div class="section-head"><div><button class="soft small" data-action="back-home">← 返回上一頁</button><h2 style="margin-top:10px">📊 收支明細分析</h2><div class="subtle">可跨月份及較長期間統計，包含已離托孩童的歷史紀錄</div></div></div>
     <div class="analysis-controls">
-      <div class="field"><label>分析對象</label><select class="month-picker" id="analysisScope"><option value="*" ${analysisChildId==='*'?'selected':''}>所有孩童總計</option>${children.map(c=>`<option value="${esc(c.id)}" ${analysisChildId===c.id?'selected':''}>${esc(c.name)}${c.status==='archived'?'（已離托）':''}</option>`).join('')}</select></div>
-      <div class="field"><label>統計月份</label><input class="month-picker" type="month" id="analysisMonth" value="${esc(month)}"></div>
+      <div class="field"><label>分析對象</label><select class="month-picker" id="analysisScope"><option value="*" ${analysisChildId==='*'?'selected':''}>所有孩童總計</option>${children.map(c=>`<option value="${esc(c.id)}" ${String(analysisChildId)===String(c.id)?'selected':''}>${esc(c.name)}${c.status==='archived'?'（已離托）':''}</option>`).join('')}</select></div>
+      <div class="field"><label>開始月份</label><input class="month-picker" type="month" id="analysisStartMonth" value="${esc(startMonth)}"></div>
+      <div class="field"><label>結束月份</label><input class="month-picker" type="month" id="analysisEndMonth" value="${esc(endMonth)}"></div>
     </div>
-    <div class="global-setting-note">目前檢視：${esc(scopeName)}・${esc(month.replace('-',' 年 '))} 月</div>
-    <div class="summary-grid"><div class="summary-card"><span>收入總額</span><strong class="income">${money(t.income)}</strong></div><div class="summary-card"><span>支出／退費總額</span><strong class="expense">${money(t.expense)}</strong></div><div class="summary-card"><span>收入淨額</span><strong class="net">${money(t.net)}</strong></div></div>
-    <h3 style="font-size:16px;margin:8px 0">收入項目分析</h3>
-    ${Object.keys(group.income).length?Object.entries(group.income).sort((a,b)=>b[1]-a[1]).map(([name,value])=>`<div class="category-breakdown"><span>${esc(name)}</span><strong class="income">${money(value)}</strong></div>`).join(''):'<div class="empty">這個月份沒有收入紀錄。</div>'}
-    <hr class="divider"><h3 style="font-size:16px;margin:8px 0">支出項目分析</h3>
-    ${Object.keys(group.expense).length?Object.entries(group.expense).sort((a,b)=>b[1]-a[1]).map(([name,value])=>`<div class="category-breakdown"><span>${esc(name)}</span><strong class="expense">${money(value)}</strong></div>`).join(''):'<div class="empty">這個月份沒有支出紀錄。</div>'}
-    ${analysisChildId==='*'?`<hr class="divider"><h3 style="font-size:16px;margin:8px 0">各孩童本月小計</h3><div class="child-analysis-row child-analysis-head"><span>孩童</span><span>收入</span><span>支出</span><span>淨額</span></div>${byChild.length?byChild.map(x=>`<div class="child-analysis-row"><strong>${esc(x.child.name)}${x.child.status==='archived'?'（已離托）':''}</strong><span class="income">${money(x.total.income)}</span><span class="expense">${money(x.total.expense)}</span><strong class="child-net ${x.total.net>=0?'net':'expense'}">${money(x.total.net)}</strong></div>`).join(''):'<div class="empty">這個月份還沒有孩童收支紀錄。</div>'}`:''}
-    <hr class="divider"><h3 style="font-size:16px;margin:8px 0">本月逐筆明細（${selectedRecords.length} 筆）</h3>
-    ${selectedRecords.length?`<div class="record-list">${selectedRecords.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(r=>{const c=children.find(x=>x.id===r.childId);return `<div class="record"><div class="record-main"><div class="record-title">${esc(r.category||'未分類')} <span class="subtle">・${esc(c?.name||'未知孩童')}</span></div><div class="record-meta">${esc(r.date||'')}${r.note?'・'+esc(r.note):''}</div></div><div class="record-amount ${r.type==='income'?'income':'expense'}">${r.type==='income'?'+':'−'}${money(r.amount)}</div></div>`;}).join('')}</div>`:'<div class="empty">沒有符合條件的逐筆明細。</div>'}
+    <div class="global-setting-note">目前檢視：${esc(scopeName)}・${esc(rangeLabel)}</div>
+    <div class="summary-grid"><div class="summary-card"><span>期間收入總額</span><strong class="income">${money(t.income)}</strong></div><div class="summary-card"><span>期間支出／退費</span><strong class="expense">${money(t.expense)}</strong></div><div class="summary-card"><span>期間收入淨額</span><strong class="net">${money(t.net)}</strong></div></div>
+    <div class="analysis-chart-card"><h3>期間收入與支出比較</h3><div class="chart-row"><div class="chart-row-head"><span>收入</span><strong class="income">${money(t.income)}</strong></div><div class="chart-track"><div class="chart-fill income" style="width:${Math.max(0,t.income/compareMax*100)}%"></div></div></div><div class="chart-row"><div class="chart-row-head"><span>支出／退費</span><strong class="expense">${money(t.expense)}</strong></div><div class="chart-track"><div class="chart-fill expense" style="width:${Math.max(0,t.expense/compareMax*100)}%"></div></div></div></div>
+    <div class="analysis-chart-grid"><div class="analysis-chart-card"><h3>收入項目分布</h3>${renderAnalysisCategoryRows(group.income,'income',t.income)}</div><div class="analysis-chart-card"><h3>支出項目分布</h3>${renderAnalysisCategoryRows(group.expense,'expense',t.expense)}</div></div>
+    ${renderAnalysisTrend(analysisChildId,startMonth,endMonth)}
+    ${analysisChildId==='*'?`<div class="analysis-chart-card"><h3>各孩童收支比較</h3>${renderAnalysisChildChart(byChild)}</div><hr class="divider"><h3 style="font-size:16px;margin:8px 0">各孩童期間小計</h3><div class="child-analysis-row child-analysis-head"><span>孩童</span><span>收入</span><span>支出</span><span>淨額</span></div>${byChild.length?byChild.map(x=>`<div class="child-analysis-row"><strong>${esc(x.child.name)}${x.child.status==='archived'?'（已離托）':''}</strong><span class="income">${money(x.total.income)}</span><span class="expense">${money(x.total.expense)}</span><strong class="child-net ${x.total.net>=0?'net':'expense'}">${money(x.total.net)}</strong></div>`).join(''):'<div class="empty">這段期間還沒有孩童收支紀錄。</div>'}`:''}
+    <hr class="divider"><h3 style="font-size:16px;margin:8px 0">期間逐筆明細（${selectedRecords.length} 筆）</h3>
+    ${selectedRecords.length?`<div class="record-list">${selectedRecords.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(r=>{const c=children.find(x=>String(x.id)===String(r.childId));return `<div class="record"><div class="record-main"><div class="record-title">${esc(r.category||'未分類')} <span class="subtle">・${esc(c?.name||'未知孩童')}</span></div><div class="record-meta">${esc(r.date||'')}${r.note?'・'+esc(r.note):''}</div></div><div class="record-amount ${r.type==='income'?'income':'expense'}">${r.type==='income'?'+':'−'}${money(r.amount)}</div></div>`;}).join('')}</div>`:'<div class="empty">沒有符合期間的逐筆明細。</div>'}
   </section>`);
+}
+
+
+function settlementRules(){
+  const raw=state.settings.settlementRules||{};
+  const asRatio=(v,fallback)=>v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))&&Number(v)>=0&&Number(v)<=1?Number(v):fallback;
+  const monthKeys=Object.keys(state.settings.monthlySettlements||{}).sort().reverse();
+  const latest=monthKeys.length?(state.settings.monthlySettlements[monthKeys[0]]||{}):{};
+  return {generalRatio:asRatio(raw.generalRatio,asRatio(latest.generalRatio,1/3)),foodRatio:asRatio(raw.foodRatio,asRatio(latest.foodRatio,1/3))};
+}
+function settlementRulesForm(){
+  const r=settlementRules();
+  openModal('分帳規則設定',`<p class="helper">設定每月分帳的預設比例。一般收入與副食品費分開計算；每個月份仍可在結算頁輸入該月手動金額。</p><div class="field"><label>一般收入分帳比例（%）</label><input name="generalRatio" type="number" min="0" max="100" step="0.1" required value="${(r.generalRatio*100).toFixed(1)}"></div><div class="field"><label>副食品費分帳比例（%）</label><input name="foodRatio" type="number" min="0" max="100" step="0.1" required value="${(r.foodRatio*100).toFixed(1)}"></div><div class="modal-actions"><button type="button" class="soft" data-action="close-modal">取消</button><button type="submit" class="primary">儲存分帳規則</button></div>`,'settlementRules');
+}
+function settlementData(month){
+  const all=state.settings.monthlySettlements||{};
+  const raw=all[month]||{};
+  const rules=settlementRules();
+  return {
+    generalRatio:raw.generalRatio!==undefined&&raw.generalRatio!==''?Number(raw.generalRatio):rules.generalRatio,
+    foodRatio:raw.foodRatio!==undefined&&raw.foodRatio!==''?Number(raw.foodRatio):rules.foodRatio,
+    generalOverride:raw.generalOverride??'',foodOverride:raw.foodOverride??'',
+    coworkerAdvances:Array.isArray(raw.coworkerAdvances)?raw.coworkerAdvances:[],
+    // 舊版「代墊物品」曾直接從應付同事金額扣除，沿用為「工作室代墊同事」以保持舊結算結果一致。
+    studioAdvances:Array.isArray(raw.studioAdvances)?raw.studioAdvances:(Array.isArray(raw.advances)?raw.advances:[]),
+    memo:raw.memo||''
+  };
+}
+function settlementCalc(month,d){
+  const rows=state.transactions.filter(t=>String(t.date||'').startsWith(month)&&t.type==='income');
+  const foodRows=rows.filter(t=>/副食品/.test(String(t.category||'')));
+  const foodByChild=Object.values(foodRows.reduce((acc,t)=>{const key=String(t.childId||'');if(!acc[key])acc[key]={childId:key,amount:0};acc[key].amount+=Number(t.amount||0);return acc;},{}));
+  const generalRows=rows.filter(t=>!/副食品/.test(String(t.category||'')));
+  const totalIncome=rows.reduce((a,t)=>a+Number(t.amount||0),0);
+  const generalTotal=generalRows.reduce((a,t)=>a+Number(t.amount||0),0);
+  const foodTotal=foodRows.reduce((a,t)=>a+Number(t.amount||0),0);
+  const generalShare=d.generalOverride!==''&&d.generalOverride!=null?Number(d.generalOverride):Math.round(generalTotal*Number(d.generalRatio??1/3));
+  const foodShare=d.foodOverride!==''&&d.foodOverride!=null?Number(d.foodOverride):Math.round(foodTotal*Number(d.foodRatio??1/3));
+  const coworkerAdvances=(d.coworkerAdvances||[]).reduce((a,x)=>a+Number(x.amount||0),0);
+  const studioAdvances=(d.studioAdvances||[]).reduce((a,x)=>a+Number(x.amount||0),0);
+  const entitled=generalShare+foodShare;
+  const due=entitled+coworkerAdvances-studioAdvances;
+  return {totalIncome,generalTotal,foodTotal,generalShare,foodShare,entitled,coworkerAdvances,studioAdvances,due,studioIncome:totalIncome-due,foodRows,foodByChild};
+}
+function renderAdvanceRows(rows,type){
+  if(!rows.length)return '<div class="empty">尚無代墊紀錄。</div>';
+  return rows.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).map(a=>`<div class="advance-row"><div class="advance-main"><b>${esc(a.item||a.detail||'未填明細')}</b><div class="subtle">${esc(a.date||'')}${a.note?'・'+esc(a.note):''}</div></div><strong>${money(a.amount)}</strong><div class="toolbar"><button class="soft small" data-action="edit-advance" data-id="${esc(a.id)}" data-advance-type="${type}">編輯</button><button class="danger small" data-action="delete-advance" data-id="${esc(a.id)}" data-advance-type="${type}">刪除</button></div></div>`).join('');
+}
+function renderSettlement(){
+  currentPage='settlement';currentChildId=null;
+  const month=analysisMonth||thisMonth(),d=settlementData(month),c=settlementCalc(month,d);
+  const allMonths=Object.keys(state.settings.monthlySettlements||{}).sort().reverse();
+  const legacyUnclassified=Array.isArray((state.settings.monthlySettlements||{})[month]?.advances)&&!Array.isArray((state.settings.monthlySettlements||{})[month]?.studioAdvances);
+  shell(`<section class="panel"><div class="section-head"><div><button class="soft small" data-action="back-home">← 返回首頁</button><h2 style="margin-top:10px">🤝 ${esc(month)} 分帳結算</h2><div class="subtle">每個月份獨立計算，不跨月合併</div></div></div>
+    <div class="field"><label>結算月份</label><input class="month-picker" id="settlementMonth" type="month" value="${esc(month)}"></div>
+    <div class="settlement-grid">
+      <div class="settlement-card"><h3>一般收入分帳</h3><div class="subtle">當月一般收入合計（不含副食品費）</div><div class="settlement-total">${money(c.generalTotal)}</div><div class="subtle">分帳比例：${(d.generalRatio*100).toFixed(1)}%</div><div class="field" style="margin-top:10px"><label>本月手動分帳金額（選填，留空依比例計算）</label><input id="generalOverride" type="number" min="0" step="1" placeholder="依預設比例計算" value="${esc(d.generalOverride)}"></div><div class="subtle">目前分帳金額：<b>${money(c.generalShare)}</b></div></div>
+      <div class="settlement-card"><h3>副食品費分帳</h3><div class="subtle">所有孩童當月副食品費總額</div><div class="settlement-total">${money(c.foodTotal)}</div><div class="subtle" style="margin:8px 0">${c.foodByChild.length?c.foodByChild.map(t=>{const ch=state.children.find(x=>String(x.id)===String(t.childId));return `<div>${esc(ch?.name||'未知孩童')}：${money(t.amount)}</div>`;}).join(''):'尚無副食品費收入紀錄'}</div><div class="subtle">分帳比例：${(d.foodRatio*100).toFixed(1)}%</div><div class="field" style="margin-top:10px"><label>本月手動分帳金額（選填，留空依比例計算）</label><input id="foodOverride" type="number" min="0" step="1" placeholder="依預設比例計算" value="${esc(d.foodOverride)}"></div><div class="subtle">目前分帳金額：<b>${money(c.foodShare)}</b></div></div>
+    </div>
+    <div class="settlement-card"><div class="section-head"><div><h3>同事代墊工作室款項</h3><div class="helper">同事先替工作室付款，增加同事應領金額。</div></div><button class="secondary small" data-action="add-advance" data-advance-type="coworker">＋ 新增代墊</button></div>${renderAdvanceRows(d.coworkerAdvances,'coworker')}<div class="category-breakdown"><span>同事代墊合計</span><strong>${money(c.coworkerAdvances)}</strong></div></div>
+    <div class="settlement-card"><div class="section-head"><div><h3>工作室代墊同事款項</h3><div class="helper">工作室先替同事付款，從同事應領金額扣除。</div></div><button class="secondary small" data-action="add-advance" data-advance-type="studio">＋ 新增代墊</button></div>${renderAdvanceRows(d.studioAdvances,'studio')}<div class="category-breakdown"><span>工作室代墊合計</span><strong>${money(c.studioAdvances)}</strong></div></div>
+    ${legacyUnclassified?'<div class="helper">舊版代墊紀錄已依原本「從應付金額扣除」的方式保留為工作室代墊同事款項。</div>':''}
+    <div class="settlement-card"><h3>本月結算結果</h3><div class="category-breakdown"><span>應領（一般收入＋副食品費）</span><b>${money(c.entitled)}</b></div><div class="category-breakdown"><span>同事代墊</span><b class="income">＋${money(c.coworkerAdvances)}</b></div><div class="category-breakdown"><span>工作室代墊</span><b class="expense">−${money(c.studioAdvances)}</b></div><div class="category-breakdown"><strong>應付同事</strong><strong class="settlement-total">${money(c.due)}</strong></div><div class="global-setting-note">應付＝應領＋同事代墊－工作室代墊。這裡只計算應付金額，不記錄已付／未付狀態；實際付款請以存摺或簽收條為準。</div><div class="category-breakdown"><span>分帳後工作室收入（原始收入－應付）</span><strong class="income">${money(c.studioIncome)}</strong></div><div class="modal-actions"><button class="primary" data-action="save-settlement">儲存本月結算</button></div></div>
+    <div class="settlement-card"><h3>歷史結算月份</h3>${allMonths.length?allMonths.map(m=>`<button class="soft small" style="margin:3px" data-action="open-settlement-month" data-month="${esc(m)}">${esc(m)}</button>`).join(''):'<div class="helper">儲存代墊或結算後會保留每月歷史紀錄。</div>'}</div>
+  </section>`);
+}
+function advanceForm(item={},advanceType='coworker'){
+  const label=advanceType==='coworker'?'同事代墊工作室':'工作室代墊同事';
+  openModal(item.id?`編輯${label}明細`:`新增${label}明細`,`<div class="field"><label>日期</label><input name="date" type="date" required value="${esc(item.date||today())}"></div><div class="field"><label>明細</label><input name="item" required maxlength="120" value="${esc(item.item||item.detail||'')}" placeholder="例如：尿布、副食品、教具或用品"></div><div class="field"><label>金額</label><input name="amount" type="number" min="1" step="1" required value="${item.amount??''}"></div><div class="field"><label>備註（選填）</label><textarea name="note" placeholder="補充說明">${esc(item.note||'')}</textarea></div><div class="modal-actions"><button type="button" class="soft" data-action="close-modal">取消</button><button type="submit" class="primary">儲存</button></div>`,'advance');
+  $('#modalForm').dataset.id=item.id||'';$('#modalForm').dataset.advanceType=advanceType;
+}
+function collectSettlementForm(monthOverride=''){
+  const month=monthOverride||$('#settlementMonth')?.value||thisMonth(),d=settlementData(month);
+  const generalOverride=$('#generalOverride')?.value??d.generalOverride;
+  const foodOverride=$('#foodOverride')?.value??d.foodOverride;
+  if((generalOverride!==''&&(!Number.isFinite(Number(generalOverride))||Number(generalOverride)<0))||(foodOverride!==''&&(!Number.isFinite(Number(foodOverride))||Number(foodOverride)<0)))throw new Error('本月手動分帳金額不可小於 0，且必須是有效數字。');
+  d.generalOverride=generalOverride;d.foodOverride=foodOverride;
+  return {month,d};
 }
 
 function renderNotes(child) {
@@ -569,6 +754,7 @@ function renderSettings() {
     <div class="settings-list">
       <button class="setting-tile" data-action="manage-categories"><strong>🧾 收入／支出項目設定</strong><span class="subtle">全體孩童共用，可新增、編輯、停用及排序</span></button>
       <button class="setting-tile" data-action="manage-note-types"><strong>📝 簡易記事類型設定</strong><span class="subtle">全體孩童共用，可自由新增、編輯、停用及排序</span></button>
+      <button class="setting-tile" data-action="settlement-rules"><strong>⚖️ 分帳規則設定</strong><span class="subtle">設定一般收入及副食品費的預設分帳比例；每月結算時可另作調整</span></button>
     </div>
     <hr class="divider"><h3 style="font-size:16px">備份與還原</h3>
     <div class="backup-grid">
@@ -695,7 +881,14 @@ async function handleAction(action,el) {
   if(action==='close-modal'){closeModal();return;}
   if(action==='show-active'){showArchived=false;currentPage='home';renderHome();return;}
   if(action==='show-archived'){showArchived=true;currentPage='home';renderHome();return;}
-  if(action==='analysis'){analysisChildId='*';analysisMonth=thisMonth();currentChildId=null;currentPage='analysis';pushRouteHistory();renderAnalysis();return;}
+  if(action==='settlement'){analysisMonth=el.dataset.month||thisMonth();currentPage='settlement';pushRouteHistory();renderSettlement();return;}
+  if(action==='settlement-rules'){settlementRulesForm();return;}
+  if(action==='open-settlement-month'){analysisMonth=el.dataset.month||thisMonth();renderSettlement();return;}
+  if(action==='save-settlement'){const {month,d}=collectSettlementForm();const all={...(state.settings.monthlySettlements||{}),[month]:d};await apiMutation([{kind:'saveSetting',data:{key:'monthlySettlements',value:all}}]);analysisMonth=month;renderSettlement();showToast('本月分帳結算已儲存');return;}
+  if(action==='add-advance'){const {month,d}=collectSettlementForm();const all={...(state.settings.monthlySettlements||{}),[month]:d};await apiMutation([{kind:'saveSetting',data:{key:'monthlySettlements',value:all}}]);const type=el.dataset.advanceType==='studio'?'studio':'coworker';advanceForm({},type);$('#modalForm').dataset.month=month;return;}
+  if(action==='edit-advance'){const {month,d}=collectSettlementForm();const all={...(state.settings.monthlySettlements||{}),[month]:d};await apiMutation([{kind:'saveSetting',data:{key:'monthlySettlements',value:all}}]);const type=el.dataset.advanceType==='studio'?'studio':'coworker',key=type==='studio'?'studioAdvances':'coworkerAdvances';const item=(d[key]||[]).find(x=>x.id===id);if(item){advanceForm(item,type);$('#modalForm').dataset.month=month;}return;}
+  if(action==='delete-advance'){const {month,d}=collectSettlementForm();if(!confirm('確定刪除這筆代墊明細？'))return;const type=el.dataset.advanceType==='studio'?'studio':'coworker',key=type==='studio'?'studioAdvances':'coworkerAdvances';d[key]=(d[key]||[]).filter(x=>x.id!==id);const all={...(state.settings.monthlySettlements||{}),[month]:d};await apiMutation([{kind:'saveSetting',data:{key:'monthlySettlements',value:all}}]);analysisMonth=month;renderSettlement();showToast('代墊明細已刪除');return;}
+  if(action==='analysis'){analysisChildId='*';analysisMonth=thisMonth();analysisStartMonth=buildAnalysisMonths(thisMonth(),6)[0];analysisEndMonth=thisMonth();currentChildId=null;currentPage='analysis';pushRouteHistory();renderAnalysis();return;}
   if(action==='open-child'){currentChildId=id;currentPage='home';childTab='ledger';selectedMonth=thisMonth();pushRouteHistory();render();return;}
   if(action==='back-home'){if(history.length>1){history.back();}else{currentChildId=null;currentPage='home';showArchived=false;renderHome();}return;}
   if(action==='add-child'){childForm();return;}
@@ -778,6 +971,28 @@ async function handleAction(action,el) {
 
 async function handleFormSubmit(form) {
   const fd=new FormData(form);const data=Object.fromEntries(fd.entries());
+  if(form.dataset.form==='advance'){
+    const month=form.dataset.month||thisMonth();
+    const all={...(state.settings.monthlySettlements||{})};
+    const d=settlementData(month);
+    const advanceType=form.dataset.advanceType==='studio'?'studio':'coworker';
+    const key=advanceType==='studio'?'studioAdvances':'coworkerAdvances';
+    const id=form.dataset.id||uid('advance');
+    const old=(d[key]||[]).find(x=>x.id===id)||{};
+    const item={...old,id,date:data.date,item:String(data.item||'').trim(),amount:Number(data.amount||0),note:data.note||''};
+    if(!item.item)throw new Error('請填寫代墊明細。');
+    if(!item.date)throw new Error('請選擇代墊日期。');
+    if(item.amount<=0)throw new Error('代墊金額必須大於 0。');
+    d[key]=[...(d[key]||[]).filter(x=>x.id!==id),item];all[month]=d;
+    await apiMutation([{kind:'saveSetting',data:{key:'monthlySettlements',value:all}}]);
+    closeModal();analysisMonth=month;renderSettlement();showToast('代墊明細已儲存');return;
+  }
+  if(form.dataset.form==='settlementRules'){
+    const generalRatio=Number(data.generalRatio)/100,foodRatio=Number(data.foodRatio)/100;
+    if(!Number.isFinite(generalRatio)||!Number.isFinite(foodRatio)||generalRatio<0||generalRatio>1||foodRatio<0||foodRatio>1)throw new Error('分帳比例請輸入 0 到 100。');
+    await apiMutation([{kind:'saveSetting',data:{key:'settlementRules',value:{generalRatio,foodRatio}}}]);
+    closeModal();renderSettings();showToast('分帳規則已儲存');return;
+  }
   if(form.dataset.form==='child'){
     const id=form.dataset.id||uid('child');
     const old=state.children.find(c=>c.id===id)||{};
@@ -851,20 +1066,21 @@ function showConnectionError(message) {
 }
 
 // 全域事件委派：凡涉及雲端讀寫，立即顯示處理遮罩與按鈕忙碌狀態。
-const NETWORK_ACTIONS=new Set(['archive-child','restore-child','delete-transaction','delete-note','toggle-category','move-category','toggle-note-type','move-note-type','cloud-backup','cloud-restore','local-backup']);
+const NETWORK_ACTIONS=new Set(['archive-child','restore-child','delete-transaction','delete-note','toggle-category','move-category','toggle-note-type','move-note-type','cloud-backup','cloud-restore','local-backup','save-settlement','add-advance','edit-advance','delete-advance']);
 const ACTION_BUSY_LABELS={
   'archive-child':'正在更新孩童狀態…','restore-child':'正在恢復收托資料…',
   'delete-transaction':'正在刪除收支紀錄…','delete-note':'正在刪除簡易記事…',
   'toggle-category':'正在更新共用收支項目…','move-category':'正在調整共用項目順序…',
   'toggle-note-type':'正在更新記事類型…','move-note-type':'正在調整記事類型順序…',
-  'cloud-backup':'正在建立雲端備份…','cloud-restore':'正在從雲端還原資料…','local-backup':'正在準備本機備份…'
+  'cloud-backup':'正在建立雲端備份…','cloud-restore':'正在從雲端還原資料…','local-backup':'正在準備本機備份…',
+  'save-settlement':'正在儲存本月分帳結算…','add-advance':'正在準備新增代墊明細…','edit-advance':'正在準備編輯代墊明細…','delete-advance':'正在刪除代墊明細…'
 };
 $('#appRoot').addEventListener('click', async e=>{
   const target=e.target.closest('[data-action]');if(!target)return;
   if(target.dataset.action==='close-modal'&&e.target.closest('.modal'))return;
   const action=target.dataset.action;
   try{
-    if(!cloudReady && ['archive-child','restore-child','delete-transaction','delete-note','toggle-category','move-category','toggle-note-type','move-note-type','cloud-backup','cloud-restore','local-backup','local-restore'].includes(action)){showToast('正在同步最新雲端資料，完成後即可執行這項操作。');return;}
+    if(!cloudReady && ['archive-child','restore-child','delete-transaction','delete-note','toggle-category','move-category','toggle-note-type','move-note-type','cloud-backup','cloud-restore','local-backup','local-restore','save-settlement','add-advance','edit-advance','delete-advance'].includes(action)){showToast('正在同步最新雲端資料，完成後即可執行這項操作。');return;}
     if(NETWORK_ACTIONS.has(action))await withBusy(ACTION_BUSY_LABELS[action]||'正在處理雲端資料…',()=>handleAction(action,target),target);
     else await handleAction(action,target);
   }catch(err){showToast(err.message||String(err));}
@@ -875,7 +1091,7 @@ $('#modalRoot').addEventListener('click', async e=>{
   if(target.dataset.action==='close-modal'){closeModal();return;}
   const action=target.dataset.action;
   try{
-    if(!cloudReady && ['archive-child','restore-child','delete-transaction','delete-note','toggle-category','move-category','toggle-note-type','move-note-type','cloud-backup','cloud-restore','local-backup','local-restore'].includes(action)){showToast('正在同步最新雲端資料，完成後即可執行這項操作。');return;}
+    if(!cloudReady && ['archive-child','restore-child','delete-transaction','delete-note','toggle-category','move-category','toggle-note-type','move-note-type','cloud-backup','cloud-restore','local-backup','local-restore','save-settlement','add-advance','edit-advance','delete-advance'].includes(action)){showToast('正在同步最新雲端資料，完成後即可執行這項操作。');return;}
     if(NETWORK_ACTIONS.has(action))await withBusy(ACTION_BUSY_LABELS[action]||'正在處理雲端資料…',()=>handleAction(action,target),target);
     else await handleAction(action,target);
   }catch(err){showToast(err.message||String(err));}
@@ -890,12 +1106,22 @@ document.addEventListener('submit',async e=>{
   }
 });
 
-document.addEventListener('change',e=>{
+document.addEventListener('change',async e=>{
   if(e.target.id==='ledgerMonth'){selectedMonth=e.target.value;render();}
   if(e.target.id==='monthPicker'){selectedMonth=e.target.value||thisMonth();render();}
   if(e.target.id==='noteMonth'){selectedMonth=e.target.value;render();}
   if(e.target.id==='analysisScope'){analysisChildId=e.target.value;renderAnalysis();}
-  if(e.target.id==='analysisMonth'){analysisMonth=e.target.value||thisMonth();renderAnalysis();}
+  if(e.target.id==='analysisStartMonth'){analysisStartMonth=e.target.value||buildAnalysisMonths(thisMonth(),6)[0];if(analysisStartMonth>analysisEndMonth)analysisEndMonth=analysisStartMonth;renderAnalysis();}
+  if(e.target.id==='analysisEndMonth'){analysisEndMonth=e.target.value||thisMonth();if(analysisEndMonth<analysisStartMonth)analysisStartMonth=analysisEndMonth;renderAnalysis();}
+  if(e.target.id==='settlementMonth'){
+    const previousMonth=analysisMonth||thisMonth(),nextMonth=e.target.value||thisMonth();
+    try{
+      const {d}=collectSettlementForm(previousMonth);
+      const all={...(state.settings.monthlySettlements||{}),[previousMonth]:d};
+      await withBusy('正在保存本月分帳設定…',()=>apiMutation([{kind:'saveSetting',data:{key:'monthlySettlements',value:all}}]));
+      analysisMonth=nextMonth;renderSettlement();
+    }catch(err){showToast(err.message||String(err));renderSettlement();}
+  }
   if(e.target.id==='localFileInput'&&e.target.files?.[0]){const file=e.target.files[0];withBusy('正在匯入本機備份…',()=>localRestore(file),null,'資料會分批寫入雲端試算表，請保持網路連線。').catch(err=>showToast(err.message||String(err))).finally(()=>e.target.value='');}
 });
 function isStandaloneApp(){
