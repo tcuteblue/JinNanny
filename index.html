@@ -316,6 +316,12 @@ function normalizeState(s) {
       categories.push({...c,childId:'__legacy__',active:false});
     }
   });
+  // 預設收入項目：托育費。若雲端尚未建立，前端也會補入選單，確保可立即選用；不覆蓋既有項目。
+  const hasChildcareFee=categories.some(c=>c.type==='income'&&String(c.name||'').trim()==='托育費'&&c.active!==false&&c.active!=='false');
+  if(!hasChildcareFee){
+    const incomeSort=categories.filter(c=>c.type==='income').reduce((max,c)=>Math.max(max,Number(c.sort)||0),0);
+    categories.push({id:'cat_childcare_fee',childId:'*',type:'income',name:'托育費',sort:incomeSort+10,active:true});
+  }
   return {children:Array.isArray(s.children)?s.children:[],transactions:Array.isArray(s.transactions)?s.transactions:[],notes:Array.isArray(s.notes)?s.notes:[],categories,settings:s.settings||{}};
 }
 function showToast(message) {
