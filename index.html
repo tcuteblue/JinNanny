@@ -222,12 +222,20 @@ button:disabled{cursor:not-allowed;opacity:.58;filter:saturate(.65);transform:no
 .child-analysis-row:last-child{border-bottom:0}
 .child-analysis-head{font-size:11px;color:#9a826a;font-weight:750;padding:4px 0 7px;border-bottom:1px solid #eadcc9}
 @media(max-width:480px){.backup-grid{gap:9px}.backup-tile{min-height:76px;font-size:14px;padding:11px 7px}.analysis-controls{grid-template-columns:1fr}.child-analysis-row{grid-template-columns:minmax(0,1fr) auto auto auto;gap:5px;font-size:11px}.child-analysis-head{font-size:10px}}
+.home-controls{display:grid;grid-template-columns:1.08fr 1fr 1fr;gap:8px;margin:12px 0 15px}
+.home-controls button{min-width:0;min-height:43px;padding:8px 5px;font-size:13px;white-space:nowrap}
+.home-controls .tab{border-radius:13px}
+.home-controls .tab.active{transform:none}
+.statusline{transition:color .15s ease}
+.statusline[data-kind="ok"]{color:#55834e}
+.statusline[data-kind="offline"]{color:#b15d39}
+@media(max-width:380px){.home-controls{gap:5px}.home-controls button{font-size:12px;padding:7px 3px}}
 
 </style>
 </head>
 <body>
 <div id="appRoot" class="app">
-  <div id="loading" class="empty"><div class="busy-spinner"></div><strong>正在連接工作室雲端資料……</strong><div class="helper">正在讀取總控試算表，請稍候。</div></div>
+  <div id="loading" class="empty"><div class="busy-spinner"></div><strong>正在載入工作室資料……</strong><div class="helper">首次使用會讀取雲端資料；下次會先顯示本機上次同步資料。</div></div>
 </div>
 <div id="modalRoot"></div>
 <div id="toastRoot"></div>
@@ -256,6 +264,80 @@ let showArchived = false;
 let toastTimer = null;
 let requestCounter = 0;
 let deferredInstallPrompt = null;
+const LOCAL_CACHE_KEY = 'studioIncomeLedgerCache.v1';
+let cloudReady = false;
+let localCacheAvailable = false;
+let syncStatusText = '首次載入雲端資料…';
+let syncStatusKind = 'loading';
+let historyInitialized = false;
+
+function saveLocalCache() {
+  try {
+    localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify({savedAt:new Date().toISOString(),state}));
+    localCacheAvailable = true;
+  } catch (err) {
+    // 本機空間不足或瀏覽器限制時，不影響雲端資料操作。
+    console.warn('本機快取儲存失敗', err);
+  }
+}
+function readLocalCache() {
+  try {
+    const raw=localStorage.getItem(LOCAL_CACHE_KEY);
+    if(!raw)return null;
+    const parsed=JSON.parse(raw);
+    if(!parsed || !parsed.state || typeof parsed.state!=='object')return null;
+    return parsed;
+  } catch (err) {
+    console.warn('讀取本機快取失敗', err);
+    return null;
+  }
+}
+function setSyncStatus(message,kind='loading') {
+  syncStatusText=message;syncStatusKind=kind;
+  const el=$('#syncStatus');
+  if(el){el.textContent=message;el.dataset.kind=kind;}
+}
+function routeSnapshot() {
+  return {__studioRoute:true,page:currentPage,childId:currentChildId,childTab,selectedMonth,showArchived,analysisChildId,analysisMonth};
+}
+function pushRouteHistory() {
+  try { history.pushState(routeSnapshot(), '', location.href); } catch (_) {}
+}
+function initializeAppHistory() {
+  if(historyInitialized)return;historyInitialized=true;
+  try {
+    // 保留瀏覽器原本的上一頁，並在程式根頁放一個退出確認關卡。
+    history.replaceState({__studioExitGate:true}, '', location.href);
+    history.pushState({__studioRootGuard:true}, '', location.href);
+  } catch (_) {}
+}
+function restoreRoute(route) {
+  if(!route || route.__studioRootGuard) {
+    currentPage='home';currentChildId=null;showArchived=false;childTab='ledger';selectedMonth=thisMonth();
+  } else {
+    currentPage=route.page||'home';currentChildId=route.childId||null;
+    childTab=route.childTab||'ledger';selectedMonth=route.selectedMonth||thisMonth();
+    showArchived=!!route.showArchived;analysisChildId=route.analysisChildId||'*';analysisMonth=route.analysisMonth||thisMonth();
+  }
+  render();
+}
+function showExitPrompt() {
+  openModal('要離開工作室收入記帳嗎？',`<p class="helper" style="font-size:14px">按「離開」返回上一個頁面；按「取消」繼續使用工作室收入記帳。</p><div class="modal-actions"><button type="button" class="soft" data-action="stay-app">取消</button><button type="button" class="primary" data-action="exit-app">離開</button></div>`);
+}
+window.addEventListener('popstate',e=>{
+  if($('#modalRoot')?.firstElementChild){
+    closeModal();
+    try{history.pushState(routeSnapshot(), '', location.href);}catch(_){}
+    return;
+  }
+  if(e.state?.__studioExitGate){
+    restoreRoute({page:'home'});showExitPrompt();return;
+  }
+  if(e.state?.__studioRootGuard){restoreRoute(e.state);return;}
+  if(e.state?.__studioRoute){restoreRoute(e.state);return;}
+  // 瀏覽器未保留狀態時，仍回到程式首頁並提供退出確認。
+  restoreRoute({page:'home'});showExitPrompt();
+});
 
 function base64UrlEncode(text) {
   const bytes = new TextEncoder().encode(text);
@@ -295,6 +377,9 @@ async function loadState(showNotice=true) {
   const result = await api('bootstrap');
   if (!result.ok) throw new Error(result.error || '讀取雲端資料失敗。');
   state = normalizeState(result.state || {});
+  cloudReady = true;
+  saveLocalCache();
+  setSyncStatus('☁️ 雲端資料已同步', 'ok');
   if (showNotice) showToast('雲端資料已同步');
   render();
 }
@@ -360,7 +445,7 @@ function shell(content) {
         <button class="icon-btn" data-action="settings" title="設定與備份">⚙️</button>
       </div>
     </header>
-    <div class="statusline">☁️ 雲端同步中｜資料保存於專用 Google 試算表</div>
+    <div id="syncStatus" class="statusline" data-kind="${esc(syncStatusKind)}">${esc(syncStatusText)}</div>
     ${content}
     <div class="footer">工作室收入記帳・專用雲端資料</div>`;
   updateInstallButton();
@@ -374,8 +459,8 @@ function renderHome() {
   const expenses=state.transactions.filter(t=>String(t.date||'').startsWith(thisMonth())&&t.type==='expense').reduce((s,t)=>s+Number(t.amount||0),0);
   shell(`
     <section class="panel">
-      <div class="section-head"><div><h2>${showArchived?'已離托孩童':'目前收托孩童'}</h2><div class="subtle">${showArchived?'歷史資料完整保留，可隨時恢復收托':'選擇孩童即可查看個別收支與記事'}</div></div><div class="toolbar"><button class="secondary" data-action="analysis">📊 收支分析</button><button class="primary" data-action="add-child">＋ 新增孩童</button></div></div>
-      <div class="tab-row"><button class="tab ${!showArchived?'active':''}" data-action="show-active">收托中（${active.length}）</button><button class="tab ${showArchived?'active':''}" data-action="show-archived">已離托（${archived.length}）</button></div>
+      <div class="section-head"><div><h2>${showArchived?'已離托孩童':'目前收托孩童'}</h2><div class="subtle">${showArchived?'歷史資料完整保留，可隨時恢復收托':'選擇孩童即可查看個別收支與記事'}</div></div></div>
+      <div class="home-controls"><button class="primary" data-action="add-child">＋ 新增孩童</button><button class="tab ${!showArchived?'active':''}" data-action="show-active">收托中（${active.length}）</button><button class="tab ${showArchived?'active':''}" data-action="show-archived">已離托（${archived.length}）</button></div>
       ${list.length?`<div class="children-grid">${list.map(c=>`<button class="child-card" data-action="open-child" data-id="${esc(c.id)}"><span class="child-avatar">${showArchived?'📁':'🧸'}</span><span><strong>${esc(c.name)}</strong><small>${showArchived?'已離托・點選查看歷史':'點選進入孩童帳務'}</small></span></button>`).join('')}</div>`:`<div class="empty">${showArchived?'目前沒有已離托的孩童。':'尚未新增孩童，按右上方「新增孩童」開始建立資料。'}</div>`}
     </section>
     <section class="panel"><div class="section-head"><div><h3>本月工作室收支概況</h3><div class="subtle">${thisMonth()}</div></div></div>
@@ -404,7 +489,7 @@ function renderChild(child) {
   else body=renderNotes(child);
   shell(`
     <section class="panel">
-      <div class="section-head"><div><button class="soft small" data-action="back-home">← 返回孩童列表</button><h2 style="margin-top:10px">🧸 ${esc(child.name)}${child.status==='archived'?' <span class="subtle">（已離托）</span>':''}</h2><div class="subtle">個別收支、禮金與照顧記事</div></div><div class="toolbar"><button class="soft small" data-action="manage-categories">共用項目設定</button><button class="soft small" data-action="manage-note-types">記事類型設定</button><button class="soft small" data-action="edit-child" data-id="${esc(child.id)}">編輯資料</button></div></div>
+      <div class="section-head"><div><button class="soft small" data-action="back-home">← 返回孩童列表</button><h2 style="margin-top:10px">🧸 ${esc(child.name)}${child.status==='archived'?' <span class="subtle">（已離托）</span>':''}</h2><div class="subtle">個別收支、禮金與照顧記事</div></div><div class="toolbar"><button class="soft small" data-action="edit-child" data-id="${esc(child.id)}">編輯資料</button></div></div>
       <div class="summary-grid"><div class="summary-card"><span>本月收入</span><strong class="income">${money(currentTotals.income)}</strong></div><div class="summary-card"><span>本月支出／退費</span><strong class="expense">${money(currentTotals.expense)}</strong></div><div class="summary-card"><span>本月收入淨額</span><strong class="net">${money(currentTotals.net)}</strong></div></div>
       <div class="tab-row">${tabs.map(([key,label])=>`<button class="tab ${childTab===key?'active':''}" data-action="child-tab" data-tab="${key}">${label}</button>`).join('')}</div>
       ${body}
@@ -455,7 +540,7 @@ function renderAnalysis() {
   const byChild=children.map(c=>({child:c,total:totals(allRecords.filter(r=>String(r.childId)===String(c.id)))})).filter(x=>x.total.income||x.total.expense);
   const scopeName=analysisChildId==='*'?'所有孩童':(children.find(c=>c.id===analysisChildId)?.name||'指定孩童');
   shell(`<section class="panel">
-    <div class="section-head"><div><button class="soft small" data-action="back-home">← 返回首頁</button><h2 style="margin-top:10px">📊 收支明細分析</h2><div class="subtle">可查看個別孩童或所有孩童合計（包含已離托歷史紀錄）</div></div></div>
+    <div class="section-head"><div><button class="soft small" data-action="back-home">← 返回上一頁</button><h2 style="margin-top:10px">📊 收支明細分析</h2><div class="subtle">可查看個別孩童或所有孩童合計（包含已離托歷史紀錄）</div></div></div>
     <div class="analysis-controls">
       <div class="field"><label>分析對象</label><select class="month-picker" id="analysisScope"><option value="*" ${analysisChildId==='*'?'selected':''}>所有孩童總計</option>${children.map(c=>`<option value="${esc(c.id)}" ${analysisChildId===c.id?'selected':''}>${esc(c.name)}${c.status==='archived'?'（已離托）':''}</option>`).join('')}</select></div>
       <div class="field"><label>統計月份</label><input class="month-picker" type="month" id="analysisMonth" value="${esc(month)}"></div>
@@ -480,7 +565,7 @@ function renderNotes(child) {
 }
 function renderSettings() {
   currentPage='settings';
-  shell(`<section class="panel"><div class="section-head"><div><button class="soft small" data-action="back-home">← 返回首頁</button><h2 style="margin-top:10px">設定與資料管理</h2></div></div>
+  shell(`<section class="panel"><div class="section-head"><div><button class="soft small" data-action="back-home">← 返回上一頁</button><h2 style="margin-top:10px">設定與資料管理</h2></div></div>
     <div class="settings-list">
       <button class="setting-tile" data-action="manage-categories"><strong>🧾 收入／支出項目設定</strong><span class="subtle">全體孩童共用，可新增、編輯、停用及排序</span></button>
       <button class="setting-tile" data-action="manage-note-types"><strong>📝 簡易記事類型設定</strong><span class="subtle">全體孩童共用，可自由新增、編輯、停用及排序</span></button>
@@ -507,7 +592,11 @@ function childForm(child={}) {
 }
 function getChildCategories(_childId,type=null) {
   const list=state.categories.filter(c=>String(c.childId||'')==='*'&&c.active!==false&&c.active!=='false');
-  return (type?list.filter(c=>c.type===type):list).sort((a,b)=>a.type.localeCompare(b.type)||Number(a.sort)-Number(b.sort));
+  return (type?list.filter(c=>c.type===type):list).sort((a,b)=>{
+    if(a.type!==b.type)return a.type.localeCompare(b.type);
+    if(a.type==='income'){const ap=String(a.name||'').trim()==='托育費'?0:1,bp=String(b.name||'').trim()==='托育費'?0:1;if(ap!==bp)return ap-bp;}
+    return Number(a.sort)-Number(b.sort);
+  });
 }
 
 function transactionForm(type='income',record={}) {
@@ -585,7 +674,7 @@ function durationMinutes(start,end) {
 function formatDuration(minutes) { return minutes?`${Math.floor(minutes/60)} 小時 ${minutes%60} 分鐘`:'尚未計算'; }
 function updateDurationPreview(){const m=durationMinutes($('#noteStart')?.value,$('#noteEnd')?.value);$('#durationPreview').textContent=formatDuration(m);}
 function categoryManager() {
-  const cats=state.categories.filter(c=>String(c.childId||'')==='*').sort((a,b)=>a.type.localeCompare(b.type)||Number(a.sort)-Number(b.sort));
+  const cats=state.categories.filter(c=>String(c.childId||'')==='*').sort((a,b)=>{if(a.type!==b.type)return a.type.localeCompare(b.type);if(a.type==='income'){const ap=String(a.name||'').trim()==='托育費'?0:1,bp=String(b.name||'').trim()==='托育費'?0:1;if(ap!==bp)return ap-bp;}return Number(a.sort)-Number(b.sort);});
   openModal('全體孩童共用－收入／支出項目設定',`<p class="helper">這裡修改一次，所有孩童（包含已離托孩童）的新增收支表單都會同步套用。停用不會影響舊帳目。</p>${['income','expense'].map(type=>`<h4>${type==='income'?'收入項目':'支出項目'}</h4>${cats.filter(c=>c.type===type).map(c=>`<div class="category-row"><span class="category-name">${esc(c.name)}${c.active===false||c.active==='false'?'（已停用）':''}</span><button class="soft small" data-action="move-category" data-id="${esc(c.id)}" data-dir="-1">↑</button><button class="soft small" data-action="move-category" data-id="${esc(c.id)}" data-dir="1">↓</button><button class="soft small" data-action="edit-category" data-id="${esc(c.id)}">編輯</button><button class="${c.active===false||c.active==='false'?'secondary':'danger'} small" data-action="toggle-category" data-id="${esc(c.id)}">${c.active===false||c.active==='false'?'啟用':'停用'}</button></div>`).join('')||'<div class="helper">尚無項目</div>'}`).join('<hr class="divider">')}<div class="modal-actions"><button class="secondary" type="button" data-action="new-category" data-type="income">＋ 收入項目</button><button class="secondary" type="button" data-action="new-category" data-type="expense">＋ 支出項目</button><button class="soft" type="button" data-action="close-modal">完成</button></div>`);
 }
 function editCategoryForm(category={}) {
@@ -606,9 +695,9 @@ async function handleAction(action,el) {
   if(action==='close-modal'){closeModal();return;}
   if(action==='show-active'){showArchived=false;currentPage='home';renderHome();return;}
   if(action==='show-archived'){showArchived=true;currentPage='home';renderHome();return;}
-  if(action==='analysis'){analysisChildId='*';analysisMonth=thisMonth();currentChildId=null;currentPage='analysis';renderAnalysis();return;}
-  if(action==='open-child'){currentChildId=id;currentPage='home';childTab='ledger';selectedMonth=thisMonth();render();return;}
-  if(action==='back-home'){currentChildId=null;currentPage='home';renderHome();return;}
+  if(action==='analysis'){analysisChildId='*';analysisMonth=thisMonth();currentChildId=null;currentPage='analysis';pushRouteHistory();renderAnalysis();return;}
+  if(action==='open-child'){currentChildId=id;currentPage='home';childTab='ledger';selectedMonth=thisMonth();pushRouteHistory();render();return;}
+  if(action==='back-home'){if(history.length>1){history.back();}else{currentChildId=null;currentPage='home';showArchived=false;renderHome();}return;}
   if(action==='add-child'){childForm();return;}
   if(action==='edit-child'){const c=state.children.find(x=>x.id===id);if(c)childForm(c);return;}
   if(action==='archive-child'||action==='restore-child'){
@@ -617,7 +706,7 @@ async function handleAction(action,el) {
     await apiMutation([{kind:'saveChild',data:{...c,status:action==='archive-child'?'archived':'active',archivedAt:action==='archive-child'?new Date().toISOString():''}}]);
     showToast(action==='archive-child'?'已移至已離托名單':'已恢復收托');return;
   }
-  if(action==='child-tab'){childTab=el.dataset.tab;if(childTab==='month'&&selectedMonth==='all')selectedMonth=thisMonth();render();return;}
+  if(action==='child-tab'){childTab=el.dataset.tab;if(childTab==='month'&&selectedMonth==='all')selectedMonth=thisMonth();pushRouteHistory();render();return;}
   if(action==='add-transaction'){transactionForm(el.dataset.type||'income');return;}
   if(action==='edit-transaction'){const r=state.transactions.find(x=>x.id===id);if(r)transactionForm(r.type,r);return;}
   if(action==='delete-transaction'){
@@ -630,7 +719,7 @@ async function handleAction(action,el) {
     if(!confirm('確定刪除這筆簡易記事？'))return;
     await apiMutation([{kind:'deleteNote',data:{id}}]);showToast('記事已刪除');return;
   }
-  if(action==='settings'){currentChildId=null;currentPage='settings';renderSettings();return;}
+  if(action==='settings'){currentChildId=null;currentPage='settings';pushRouteHistory();renderSettings();return;}
   if(action==='manage-categories'){categoryManager();return;}
   if(action==='manage-note-types'){noteTypeManager();return;}
   if(action==='new-category'){editCategoryForm({type:el.dataset.type,childId:'*'});return;}
@@ -668,6 +757,8 @@ async function handleAction(action,el) {
   }
   if(action==='local-backup'){await localBackup();return;}
   if(action==='local-restore'){$('#localFileInput').click();return;}
+  if(action==='stay-app'){closeModal();try{history.pushState({__studioRootGuard:true}, '', location.href);}catch(_){}return;}
+  if(action==='exit-app'){closeModal();history.back();return;}
   if(action==='install'){
     if(deferredInstallPrompt){
       const promptEvent=deferredInstallPrompt;
@@ -773,6 +864,7 @@ $('#appRoot').addEventListener('click', async e=>{
   if(target.dataset.action==='close-modal'&&e.target.closest('.modal'))return;
   const action=target.dataset.action;
   try{
+    if(!cloudReady && ['archive-child','restore-child','delete-transaction','delete-note','toggle-category','move-category','toggle-note-type','move-note-type','cloud-backup','cloud-restore','local-backup','local-restore'].includes(action)){showToast('正在同步最新雲端資料，完成後即可執行這項操作。');return;}
     if(NETWORK_ACTIONS.has(action))await withBusy(ACTION_BUSY_LABELS[action]||'正在處理雲端資料…',()=>handleAction(action,target),target);
     else await handleAction(action,target);
   }catch(err){showToast(err.message||String(err));}
@@ -783,13 +875,16 @@ $('#modalRoot').addEventListener('click', async e=>{
   if(target.dataset.action==='close-modal'){closeModal();return;}
   const action=target.dataset.action;
   try{
+    if(!cloudReady && ['archive-child','restore-child','delete-transaction','delete-note','toggle-category','move-category','toggle-note-type','move-note-type','cloud-backup','cloud-restore','local-backup','local-restore'].includes(action)){showToast('正在同步最新雲端資料，完成後即可執行這項操作。');return;}
     if(NETWORK_ACTIONS.has(action))await withBusy(ACTION_BUSY_LABELS[action]||'正在處理雲端資料…',()=>handleAction(action,target),target);
     else await handleAction(action,target);
   }catch(err){showToast(err.message||String(err));}
 });
 document.addEventListener('submit',async e=>{
   if(e.target.id==='modalForm'){
-    e.preventDefault();const form=e.target,btn=form.querySelector('[type="submit"]');
+    e.preventDefault();
+    if(!cloudReady){showToast('正在同步最新雲端資料，完成後即可新增或修改。');return;}
+    const form=e.target,btn=form.querySelector('[type="submit"]');
     try{await withBusy('正在儲存資料至雲端…',()=>handleFormSubmit(form),btn,'正在更新 Google 試算表並同步最新資料，完成前請勿重複送出。');}
     catch(err){showToast(err.message||String(err));}
   }
@@ -842,7 +937,7 @@ window.addEventListener('appinstalled',()=>{
   updateInstallButton();
   showToast('工作室收入記帳已成功安裝！');
 });
-window.addEventListener('online',()=>showToast('網路已恢復'));
+window.addEventListener('online',()=>{showToast('網路已恢復，正在同步雲端資料…');if(!cloudReady)loadState(false).catch(err=>{cloudReady=false;setSyncStatus('⚠️ 雲端暫時無法連線，目前顯示本機上次同步資料','offline');showToast('雲端同步仍未成功，請稍後重新整理。');});});
 window.addEventListener('offline',()=>showToast('目前離線，雲端資料功能暫時無法使用'));
 const standaloneQuery=window.matchMedia?window.matchMedia('(display-mode: standalone)'):null;
 if(standaloneQuery){
@@ -858,9 +953,32 @@ document.addEventListener('click', async e=>{
   }
 });
 
-// 開啟程式時直接連接雲端，不要求使用者輸入登入密碼。
+// 開啟程式先顯示本機上次同步快取，再於背景更新雲端；不再讓使用者空等雲端載入。
 (async function start(){
-  try{await loadState(false);}catch(err){showConnectionError(err.message||'雲端連線失敗，請檢查 GAS 部署設定。');}
+  initializeAppHistory();
+  const cached=readLocalCache();
+  if(cached){
+    state=normalizeState(cached.state);
+    localCacheAvailable=true;
+    const savedAt=cached.savedAt?new Date(cached.savedAt):null;
+    const savedLabel=savedAt&&!Number.isNaN(savedAt.getTime())?savedAt.toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'上次保存';
+    cloudReady=false;
+    syncStatusText=`📱 顯示本機資料（${savedLabel}），正在背景同步雲端…`;syncStatusKind='loading';
+    render();
+  } else {
+    setSyncStatus('首次使用，正在載入雲端資料…','loading');
+  }
+  try{
+    await loadState(false);
+  }catch(err){
+    cloudReady=false;
+    if(cached){
+      setSyncStatus('⚠️ 雲端暫時無法連線，目前顯示本機上次同步資料','offline');
+      showToast('雲端同步失敗，已保留本機快取資料；請確認網路後重新整理。');
+    }else{
+      showConnectionError(err.message||'雲端連線失敗，請檢查 GAS 部署設定。');
+    }
+  }
 })();
 </script>
 </body>
